@@ -6,17 +6,17 @@ local _M = {}
 local mt = {  __index = _M }
 local get_headers = ngx.req.get_headers
 local error_code = {
-    "HTTP_BAD_REQUEST": "request could not be understood",
-    "HTTP_METHOD_NOT_ALLOWED": "request method is not allowed",
-    "HTTP_LENGTH_REQUIRED": "request method requires a valid Content-length",
-    "HTTP_REQUEST_ENTITY_TOO_LARGE": "request exceeds system's limit",
-    "HTTP_PROTOCOL_VERSION_FORBIDDEN": "request use forbidden http protocol version",
-    "HTTP_REQUEST_BAD_METHOD": "the requested method is unknown",
-    "HTTP_REQUEST_BAD_URI": "request with invalid uri",
-    "HTTP_REQUEST_BAD_SCHEMA": "request with bad schema",
-    "HTTP_REQUEST_BAD_PROTOCOL": "request with bad protocol version",
-    "HTTP_REQUEST_BAD_CRLF": "request end failed, bad CRLF",
-    "HTTP_RESPONSE_ENTITY_TOO_LARGE": "response exceed system's limit",
+    HTTP_BAD_REQUEST= "request could not be understood",
+    HTTP_METHOD_NOT_ALLOWED= "request method is not allowed",
+    HTTP_LENGTH_REQUIRED= "request method requires a valid Content-length",
+    HTTP_REQUEST_ENTITY_TOO_LARGE= "request exceeds system's limit",
+    HTTP_PROTOCOL_VERSION_FORBIDDEN= "request use forbidden http protocol version",
+    HTTP_REQUEST_BAD_METHOD= "the requested method is unknown",
+    HTTP_REQUEST_BAD_URI= "request with invalid uri",
+    HTTP_REQUEST_BAD_SCHEMA= "request with bad schema",
+    HTTP_REQUEST_BAD_PROTOCOL= "request with bad protocol version",
+    HTTP_REQUEST_BAD_CRLF= "request end failed, bad CRLF",
+    HTTP_RESPONSE_ENTITY_TOO_LARGE= "response exceed system's limit",
 }
 
 local max_uri_length = 4096
@@ -65,17 +65,34 @@ function _M.check_in_decode()
     return true
 end
 
-function _M.check_in_strategy()
+function _M.exist_repeat_args(self, args)
+    local flag = false
+    flag = self:is_key_repeat(args)
+    return flag
+end
+
+function _M.is_key_repeat(self, keys)
+    local flag = false
+    local sort_func = function( a,b ) return a[1] < b[1] end
+    table.sort(keys, sort_func)
+    for k,v in pairs(keys) do
+        print(k, " ", v)
+        print('--------------------')
+    end
+end
+
+function _M.check_in_strategy(self)
     local header = get_headers()
     local args = ngx.req.get_uri_args()
     tprint(header)
-    for k,v in pairs(args) do
-        ngx.log(ngx.INFO, "arg: ", k, " value: ", v)
-        if string.find(v, '.*alert') then
-            ngx.log(ngx.INFO, "match")
-            return ngx.exit(ngx.HTTP_NOT_FOUND)
-        end
-    end
+    self:exist_repeat_args(args)
+    -- for k,v in pairs(args) do
+        -- ngx.log(ngx.INFO, "arg: ", k, " value: ", v)
+        -- if string.find(v, '.*alert') then
+            -- ngx.log(ngx.INFO, "match")
+            -- return ngx.exit(ngx.HTTP_NOT_FOUND)
+        -- end
+    -- end
     -- for i = 1, #header do
         -- ngx.log(ngx.INFO, "header:", header[i])
     -- end
