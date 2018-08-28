@@ -75,6 +75,40 @@ function _M.exist_repeat_headers(self, headers)
     return flag
 end
 
+function _M.abnormal_host(self)
+
+end
+
+function _M.abnormal_range(self)
+
+end
+
+function _M.arg_count_too_large(self)
+
+end
+
+function _M.url_len_too_large(self)
+
+end
+
+function _M.http_header_count_too_large(self)
+
+end
+
+function _M.referer_len_too_large(self)
+
+end
+
+--------
+
+function _M.cookie_count_too_large(self)
+
+end
+
+function _M.check_upfile_header_occurrence(self)
+
+end
+
 function _M.is_key_repeat(self, keys)
     local flag = false
     -- local sort_func = function( a,b ) return a[1] < b[1] end
