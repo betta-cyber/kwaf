@@ -66,8 +66,12 @@ function _M.check_in_decode()
 end
 
 function _M.exist_repeat_args(self, args)
-    local flag = false
     flag = self:is_key_repeat(args)
+    return flag
+end
+
+function _M.exist_repeat_headers(self, headers)
+    flag = self:is_key_repeat(headers)
     return flag
 end
 
@@ -86,14 +90,17 @@ function _M.is_key_repeat(self, keys)
 end
 
 function _M.check_in_strategy(self)
-    local header = get_headers()
+    local headers = get_headers()
+    tprint(headers)
     local args = ngx.req.get_uri_args()
-    -- tprint(header)
-    -- tprint(args)
+    -- start check
+    if self:exist_repeat_headers(headers) then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
     if self:exist_repeat_args(args) then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
-    -- for k,v in pairs(args) do
+     -- for k,v in pairs(args) do
         -- ngx.log(ngx.INFO, "arg: ", k, " value: ", v)
         -- if string.find(v, '.*alert') then
             -- ngx.log(ngx.INFO, "match")
