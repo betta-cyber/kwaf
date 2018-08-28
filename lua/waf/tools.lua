@@ -1,4 +1,10 @@
-
+function table_leng(t)
+  local leng=0
+  for k, v in pairs(t) do
+    leng=leng+1
+  end
+  return leng;
+end
 
 function tprint (t, s)
     for k, v in pairs(t) do

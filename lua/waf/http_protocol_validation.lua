@@ -73,19 +73,26 @@ end
 
 function _M.is_key_repeat(self, keys)
     local flag = false
-    local sort_func = function( a,b ) return a[1] < b[1] end
-    table.sort(keys, sort_func)
-    for k,v in pairs(keys) do
-        print(k, " ", v)
-        print('--------------------')
+    -- local sort_func = function( a,b ) return a[1] < b[1] end
+    -- table.sort(keys, sort_func)
+    len = table_leng(keys)
+    for key, value in pairs(keys) do
+        if type(value) == "table" then
+            -- it means have double key-value
+            flag = true
+        end
     end
+    return flag
 end
 
 function _M.check_in_strategy(self)
     local header = get_headers()
     local args = ngx.req.get_uri_args()
-    tprint(header)
-    self:exist_repeat_args(args)
+    -- tprint(header)
+    -- tprint(args)
+    if self:exist_repeat_args(args) then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
     -- for k,v in pairs(args) do
         -- ngx.log(ngx.INFO, "arg: ", k, " value: ", v)
         -- if string.find(v, '.*alert') then
