@@ -1,5 +1,7 @@
 require "waf/tools"
 require "resty.core.regex"
+-- need cookie plugin https://github.com/cloudflare/lua-resty-cookie
+local ck = require "resty.cookie"
 
 local _M = {}
 
@@ -19,6 +21,7 @@ local error_code = {
     HTTP_RESPONSE_ENTITY_TOO_LARGE= "response exceed system's limit",
 }
 
+-- http check setting
 local max_uri_length = 4096
 local max_uri_arg_count = 20
 local max_user_agent_length = 1024
@@ -29,7 +32,7 @@ local max_accept_length = 1024
 local max_accpet_charset_length = 128
 local max_content_length = 10485760
 local max_range_count = 5
-local max_uri_length = 5242880
+local max_range_length = 5242880
 local max_http_header_count = 32
 local max_http_header_name_length = 64
 local max_http_header_value_length = 128
@@ -83,26 +86,63 @@ function _M.abnormal_range(self)
 
 end
 
-function _M.arg_count_too_large(self)
-
+function _M.arg_count_too_large(self, args)
+    enable = true
+    if(enable) then
+        len = table_leng(args)
+        -- print(len)
+        if len > max_uri_arg_count then
+            return true
+        end
+    end
+    return false
 end
 
-function _M.url_len_too_large(self)
-
+function _M.uri_len_too_large(self, uri)
+    enable = true
+    if (enable) then
+        if tonumber(string.len(uri)) > max_uri_length then
+            return true
+        end
+    end
+    return false
 end
 
-function _M.http_header_count_too_large(self)
-
+function _M.http_header_count_too_large(self, headers)
+    enable = true
+    if(enable) then
+        len = table_leng(headers)
+        if len > max_http_header_count then
+            return true
+        end
+    end
+    return false
 end
 
-function _M.referer_len_too_large(self)
-
+function _M.referer_len_too_large(self, headers)
+    enable = true
+    if(enable) then
+        referer = headers["referer"]
+        if referer ~= nil then
+            if string.len(referer) > max_referer_length then
+                return true
+            end
+        end
+    end
+    return false
 end
 
 --------
 
-function _M.cookie_count_too_large(self)
-
+function _M.cookie_count_too_large(self, cookies)
+    enable = true
+    if (enable) then
+        len = table_leng(cookies)
+        if len > max_cookie_count then
+            return true
+        end
+    end
+    return false
 end
 
 function _M.check_upfile_header_occurrence(self)
@@ -125,13 +165,35 @@ end
 
 function _M.check_in_strategy(self)
     local headers = get_headers()
-    tprint(headers)
     local args = ngx.req.get_uri_args()
+    local uri = ngx.var.uri
+    local cookie = ck:new()
+    local cookies = cookie:get_all()
+    if ngx.req.get_method() == "POST" then
+        ngx.req.read_body()
+        local post_args, err = ngx.req.get_post_args()
+    end
+
     -- start check
     if self:exist_repeat_headers(headers) then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
     if self:exist_repeat_args(args) then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:arg_count_too_large(args) then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:http_header_count_too_large(headers) then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:referer_len_too_large(headers) then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:cookie_count_too_large(cookies) then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:uri_len_too_large(uri) then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
      -- for k,v in pairs(args) do
