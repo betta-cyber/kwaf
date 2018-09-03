@@ -1,5 +1,7 @@
 require "waf/tools"
 require "resty.core.regex"
+local cjson = require "cjson";
+local engine = require "waf/waf_engine"
 
 local _M = {}
 
@@ -13,21 +15,29 @@ function _M.new()
     return setmetatable(t, mt)
 end
 
-function _M.load_secrules(ruleset, opts)
-    local a = 1
+function _M.xss_rule()
+    local XSS_RULES = '[{"rule_id":1310100,"content":{"uri":{"match":"co","value":"ddd"}}},{"rule_id":1310101,"content":{"arg":{"match":"co","value":"ccs"}}},{"rule_id":1310102,"content":{"cookie":{"match":"co","value":"ccs"}}}]';
+    local XSS_RULES = cjson.decode(XSS_RULES);
+    local waf_engine = engine:new()
+    for _, rule in pairs(XSS_RULES) do
+        print(rule.rule_id)
+        res = waf_engine:run(rule.content)
+        if res then
+            return true
+        end
+    end
+    return false
+end
+
+function _M.check(self)
     local header = get_headers()
     local args = ngx.req.get_uri_args()
     tprint(header)
-    for k,v in pairs(args) do
-        ngx.log(ngx.INFO, "arg: ", k, " value: ", v)
-        if string.find(v, '.*alert') then
-            ngx.log(ngx.INFO, "match")
-            return ngx.exit(ngx.HTTP_NOT_FOUND)
-        end
+
+    if self:xss_rule() then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
-    -- for i = 1, #header do
-        -- ngx.log(ngx.INFO, "header:", header[i])
-    -- end
+
     return true
 end
 

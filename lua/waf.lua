@@ -13,4 +13,7 @@ if method == "POST" then
 
     local http_protocol_validation = http_protocol_validation:new()
     http_protocol_validation:check_in_strategy()
+
+    local web_general_sec = web_general_sec:new()
+    web_general_sec:check()
 end

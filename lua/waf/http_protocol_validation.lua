@@ -190,8 +190,10 @@ function _M.check_in_strategy(self)
     if self:referer_len_too_large(headers) then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
-    if self:cookie_count_too_large(cookies) then
-        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    if cookies then
+        if self:cookie_count_too_large(cookies) then
+            return ngx.exit(ngx.HTTP_BAD_REQUEST)
+        end
     end
     if self:uri_len_too_large(uri) then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
