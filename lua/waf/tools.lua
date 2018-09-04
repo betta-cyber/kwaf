@@ -23,3 +23,24 @@ function tprint (t, s)
         end
     end
 end
+
+function get_rule(ruledirname)
+    local lfs = require 'lfs'
+    local io = require 'io'
+    for file in lfs.dir('~/kwaf/rule/xss_rule') do
+        print(file)
+    end
+
+
+    local RULE_PATH = config_rule_dir
+    local RULE_FILE = io.open(RULE_PATH..'/'..rulefilename,"r")
+    if RULE_FILE == nil then
+        return
+    end
+    RULE_TABLE = {}
+    for line in RULE_FILE:lines() do
+        table.insert(RULE_TABLE,line)
+    end
+    RULE_FILE:close()
+    return(RULE_TABLE)
+end

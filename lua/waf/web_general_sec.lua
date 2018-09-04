@@ -16,7 +16,8 @@ function _M.new()
 end
 
 function _M.xss_rule()
-    local XSS_RULES = '[{"rule_id":1310100,"content":{"method":{"match":"eq","value":["post","delete"]},"url":{"match":"eq","value":"ddd"}}},{"rule_id":1310101,"content":{"arg":{"match":"co","value":"ccs"}}},{"rule_id":1310102,"content":{"cookie":{"match":"co","value":"ccs"}}}]';
+    -- local XSS_RULES = '[{"rule_id":1310101,"content":{"arg":{"match":"co","value":"ccs"}}},{"rule_id":1310102,"content":{"cookie":{"match":"co","value":"ccs"}}}]';
+    local XSS_RULES = get_rule(xss)
     local XSS_RULES = cjson.decode(XSS_RULES);
     local waf_engine = engine:new()
     for _, rule in pairs(XSS_RULES) do
@@ -32,7 +33,6 @@ end
 function _M.check(self)
     local header = get_headers()
     local args = ngx.req.get_uri_args()
-    tprint(header)
 
     if self:xss_rule() then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
