@@ -1,1 +1,16 @@
-{"rule_id":1310100,"content":{"method":{"match":"eq","value":["post","delete"]},"uri":{"match":"co","value":"/ddd"}}}
+{
+    "rule_id":1001001,
+    "content":{
+        "method":{
+            "match":"eq",
+            "value":[
+                "post",
+                "delete"
+            ]
+        },
+        "uri":{
+            "match":"co",
+            "value":"/ddd"
+        }
+    }
+}

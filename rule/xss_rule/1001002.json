@@ -1,0 +1,1 @@
+{"rule_id":1001002,"content":{"method":{"match":"eq","value":["post","delete"]},"uri":{"match":"co","value":"/ddd"}}}

@@ -27,20 +27,26 @@ end
 function get_rule(ruledirname)
     local lfs = require 'lfs'
     local io = require 'io'
-    for file in lfs.dir('~/kwaf/rule/xss_rule') do
-        print(file)
-    end
+    local cjson = require "cjson";
+    -- local RULE_PATH = config_rule_dir
+    local RULE_PATH = '/home/betta/kwaf/rule'
+    local RULE_DIR = RULE_PATH..'/'..ruledirname..'_rule'
 
-
-    local RULE_PATH = config_rule_dir
-    local RULE_FILE = io.open(RULE_PATH..'/'..rulefilename,"r")
-    if RULE_FILE == nil then
+    if RULE_DIR == nil then
         return
     end
-    RULE_TABLE = {}
-    for line in RULE_FILE:lines() do
-        table.insert(RULE_TABLE,line)
+    RULE_JSON = ''
+
+    for file in lfs.dir(RULE_DIR) do
+        if file~='.' and file~='..' then
+            local RULE_FILE = io.open(RULE_DIR..'/'..file,"r")
+            local content = RULE_FILE:read("*all")
+            RULE_JSON = RULE_JSON..','..content
+            RULE_FILE:close()
+        end
     end
-    RULE_FILE:close()
-    return(RULE_TABLE)
+    RULE_JSON = string.sub(RULE_JSON,2,string.len(RULE_JSON))
+    RULE_JSON = '['..RULE_JSON..']'
+    -- tprint(RULE_JSON)
+    return(RULE_JSON)
 end
