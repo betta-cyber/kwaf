@@ -41,27 +41,42 @@ function _M.run(self, rule)
             if (v['match'] == 'eq') then
                 for _, method_v in pairs(v['value']) do
                     if method_v == _method then
-                        rule_part_flag = true
+                        if (v["flag"] == 'b') then
+                            return true
+                        elseif(v["flag"] == 'c') then
+                            rule_part_flag = true
+                        end
                     end
                 end
             elseif (v['match'] == 'co') then
                 for _, method_v in pairs(v['value']) do
                     if rulematch(_method, method_v, "jo") then
-                        rule_part_flag = true
+                        if (v["flag"] == 'b') then
+                            return true
+                        elseif(v["flag"] == 'c') then
+                            rule_part_flag = true
+                        end
                     end
                 end
             end
         -- waf check uri part
         elseif k == 'uri' then
-            print(v['match'])
             if (v["match"] == 'co') then
                 if rulematch(uri, v["value"], "jo") then
-                    rule_part_flag = true
+                    if (v["flag"] == 'b') then
+                        return true
+                    elseif(v["flag"] == 'c') then
+                        rule_part_flag = true
+                    end
                 end
             end
             if (v["match"] == 'eq') then
                 if v["value"] == uri then
-                    rule_part_flag = true
+                    if (v["flag"] == 'b') then
+                        return true
+                    elseif(v["flag"] == 'c') then
+                        rule_part_flag = true
+                    end
                 end
             end
         -- waf check arg part
@@ -70,6 +85,9 @@ function _M.run(self, rule)
                 for key, value in pairs(args) do
                     if rulematch(value, v["value"], "jo") then
                         rule_part_flag = true
+                        if (v["flag"] == 'b') then
+                            return true
+                        end
                     end
                 end
             end
@@ -77,11 +95,39 @@ function _M.run(self, rule)
                 for key, value in pairs(args) do
                     if v["value"] == value then
                         rule_part_flag = true
+                        if (v["flag"] == 'b') then
+                            return true
+                        end
+                    end
+                end
+            end
+        -- waf check cookie part
+        elseif k == 'cookie' then
+            print(111)
+            if (v["match"] == 'co') then
+                for key, value in pairs(cookies) do
+                    print(value)
+                    print(v["value"])
+                    if rulematch(value, v["value"], "jo") then
+                        rule_part_flag = true
+                        if (v["flag"] == 'b') then
+                            return true
+                        end
+                    end
+                end
+            end
+            if (v["match"] == 'eq') then
+                for key, value in pairs(cookies) do
+                    if v["value"] == value then
+                        rule_part_flag = true
+                        if (v["flag"] == 'b') then
+                            return true
+                        end
                     end
                 end
             end
         end
-        -- waf check cookie part
+        print(rule_part_flag)
         if not rule_part_flag then
             rule_check_flag = false
             -- break loop

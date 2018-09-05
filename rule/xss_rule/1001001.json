@@ -6,11 +6,23 @@
             "value":[
                 "post",
                 "delete"
-            ]
+            ],
+            "flag":"c"
         },
         "uri":{
-            "match":"co",
-            "value":"/ddd"
+            "match": "co",
+            "value": "(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+            "flag": "b"
+        },
+        "arg":{
+            "match": "co",
+            "value": "(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+            "flag": "b"
+        },
+        "cookie":{
+            "match": "co",
+            "value": "(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+            "flag": "b"
         }
     }
 }
