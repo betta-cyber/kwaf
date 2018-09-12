@@ -169,6 +169,7 @@ function _M.check_in_strategy(self)
     local uri = ngx.var.uri
     local cookie = ck:new()
     local cookies = cookie:get_all()
+
     if ngx.req.get_method() == "POST" then
         ngx.req.read_body()
         local post_args, err = ngx.req.get_post_args()

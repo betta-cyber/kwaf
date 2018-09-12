@@ -20,9 +20,9 @@ function _M.xss_rule()
     local XSS_RULES = cjson.decode(XSS_RULES_JSON);
     local waf_engine = engine:new()
     for _, rule in pairs(XSS_RULES) do
-        print(rule.rule_id)
-        res = waf_engine:run(rule.content)
-        if res then
+        ngx.log(ngx.INFO, "rule id "..rule.rule_id)
+        xss_res = waf_engine:run(rule.content)
+        if xss_res then
             return true
         end
     end

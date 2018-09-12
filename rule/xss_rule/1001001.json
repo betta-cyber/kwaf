@@ -1,33 +1,36 @@
 {
     "rule_id":1310100,
     "content":{
-        "method":{
-            "value":"belong:[get,post]",
-            "flag":"c",
-            "next":{
-                "uri":{
-                    "value":"co:ddd",
-                    "flag":"s"
-                },
-                "multiline":[
+        "key":"method",
+        "value":"belong:[get,post]",
+        "flag":"c",
+        "next":[
+            {
+                "key":"uri",
+                "value":"co:/ddd",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"co:xxx",
+                "flag":"s"
+            },
+            {
+                "key":"multiline",
+                "value":[
                     {
-                        "args":{
-                            "value":"eq:a",
-                            "flag":"s"
-                        }
+                        "key":"arg",
+                        "value":"eq:a",
+                        "flag":"s"
                     },
                     {
-                        "arg_name":{
-                            "value":"eq:a",
-                            "flag":"s"
-                        }
+                        "key":"arg",
+                        "value":"eq:x",
+                        "flag":"s"
                     }
                 ],
-                "cookie":{
-                    "value":"co:xxx",
-                    "flag":"s"
-                }
+                "flag":"s"
             }
-        }
+        ]
     }
 }
