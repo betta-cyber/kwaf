@@ -24,12 +24,24 @@ function tprint (t, s)
     end
 end
 
+function split(inputstr, sep)
+    if sep == nil then
+            sep = "%s"
+    end
+    local t={} ; i=1
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+            t[i] = str
+            i = i + 1
+    end
+    return t
+end
+
 function get_rule(ruledirname)
     local lfs = require 'lfs'
     local io = require 'io'
     local cjson = require "cjson";
     -- local RULE_PATH = config_rule_dir
-    local RULE_PATH = '/home/betta/kwaf/rule'
+    local RULE_PATH = '/Users/shokill/kwaf/rule'
     local RULE_DIR = RULE_PATH..'/'..ruledirname..'_rule'
 
     if RULE_DIR == nil then

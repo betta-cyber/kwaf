@@ -1,28 +1,33 @@
 {
-    "rule_id":1001001,
+    "rule_id":1310100,
     "content":{
         "method":{
-            "match":"eq",
-            "value":[
-                "post",
-                "delete"
-            ],
-            "flag":"c"
-        },
-        "uri":{
-            "match": "co",
-            "value": "(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
-            "flag": "b"
-        },
-        "arg":{
-            "match": "co",
-            "value": "(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
-            "flag": "b"
-        },
-        "cookie":{
-            "match": "co",
-            "value": "(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
-            "flag": "b"
+            "value":"belong:[get,post]",
+            "flag":"c",
+            "next":{
+                "uri":{
+                    "value":"co:ddd",
+                    "flag":"s"
+                },
+                "multiline":[
+                    {
+                        "args":{
+                            "value":"eq:a",
+                            "flag":"s"
+                        }
+                    },
+                    {
+                        "arg_name":{
+                            "value":"eq:a",
+                            "flag":"s"
+                        }
+                    }
+                ],
+                "cookie":{
+                    "value":"co:xxx",
+                    "flag":"s"
+                }
+            }
         }
     }
 }
