@@ -4,7 +4,9 @@ local ck = require "resty.cookie"
 
 local rulematch = ngx.re.find
 
-local _M = {}
+local _M = {
+    _VERSION = "0.0.1"
+}
 
 local mt = {  __index = _M }
 local get_headers = ngx.req.get_headers
@@ -36,6 +38,11 @@ end
 
 function _M.parser(self, lex)
     ngx.log(ngx.INFO, "--------"..lex['key'].."--------")
+    -- c flag means continue , if c flag is true, this rule will go on to check
+    -- and we need to get the "next" rule result, if next Conditions return true
+    -- this rule return true.
+    -- if the rule content flag is s, means we will stop at this node, no need to
+    -- check continue, just return current node check result.
     local c_flag = false
     if lex['key'] == 'method' then
         ngx.log(ngx.INFO, "method check")
@@ -156,7 +163,7 @@ function _M.parser(self, lex)
         local mulit_flag = true
         for _, lv in pairs(lex['value']) do
             mulit_flag = (mulit_flag and self:parser(lv))
-            print(mulit_flag)
+            ngx.log(ngx.DEBUG, "current mulit_flag: ", v_flag)
         end
         if mulit_flag then
             if(lex['flag'] == 's') then
@@ -173,7 +180,7 @@ function _M.parser(self, lex)
         local v_flag = false
         for _, lv in pairs(lex['next']) do
             v_flag = (v_flag or self:parser(lv))
-            ngx.log(ngx.DEBUG, "current flag: ", v_flag)
+            ngx.log(ngx.DEBUG, "current c_flag: ", v_flag)
             -- break and do not go next check
             if(v_flag == true) then
                 return v_flag

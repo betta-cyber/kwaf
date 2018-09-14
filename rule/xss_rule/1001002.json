@@ -1,0 +1,24 @@
+{
+    "rule_id":10010102,
+    "content": {
+        "key":"multiline",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"uri",
+                "value":"co:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"co:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"co:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+                "flag":"s"
+            }
+        ]
+    }
+}
