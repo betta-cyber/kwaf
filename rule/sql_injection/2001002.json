@@ -1,0 +1,20 @@
+{
+    "rule_id":2001002,
+    "content":
+    {
+        "key": "single",
+        "value": [
+            {
+                "key":"arg",
+                "value":"re:(?i)(.*?[\\\"'`;)]|\\b(select|update|delete|insert|from|union|create|alter|drop|where|having|group|and|or|like|in|xor|between)\\b.*\\w*)[\\s\\xa0\\x00-\\x1f]*\\\\x23.{0,10}",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"re:(?i)(.*?[\\\"'`;)]|\\b(select|update|delete|insert|from|union|create|alter|drop|where|having|group|and|or|like|in|xor|between)\\b.*\\w*)[\\s\\xa0\\x00-\\x1f]*\\\\x23.{0,10}",
+                "flag":"s"
+            }
+        ],
+        "flag": "s"
+    }
+}

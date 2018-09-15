@@ -20,7 +20,7 @@ end
 
 
 function _M.run(self, rule)
-    self.header = get_headers()
+    self.headers = get_headers()
     self.args = ngx.req.get_uri_args()
     self.uri = ngx.var.uri
     self.cookie = ck:new()
@@ -32,9 +32,12 @@ function _M.run(self, rule)
         self.post_args, err = ngx.req.get_post_args()
     end
 
-    local rule_check_flag = true
     return self:parser(rule)
 end
+
+-- todo:
+-- need add not regular and not equal and exists and not exists and not belong
+-- and type and between and length between and count between
 
 function _M.parser(self, lex)
     ngx.log(ngx.INFO, "--------"..lex['key'].."--------")
@@ -44,6 +47,7 @@ function _M.parser(self, lex)
     -- if the rule content flag is s, means we will stop at this node, no need to
     -- check continue, just return current node check result.
     local c_flag = false
+    -- method check
     if lex['key'] == 'method' then
         ngx.log(ngx.INFO, "method check")
         local vlist = split(lex['value'], ':')
@@ -179,6 +183,49 @@ function _M.parser(self, lex)
             end
         end
         if not cookie_flag then
+            return false
+        end
+    end
+    if lex['key'] == 'header' or lex['key'] == 'header_name' then
+        ngx.log(ngx.INFO, lex['key'].." check")
+        local vlist = split(lex['value'], ':')
+        local header_flag = false
+        -- regex match
+        if vlist[1] == 're' then
+            for _header_name, _header_value in pairs(self.headers) do
+                if (lex['key'] == 'header_name') then
+                    check_v = _header_name
+                else
+                    check_v = _header_value
+                end
+                if rulematch(check_v, vlist[2], "jo") then
+                    header_flag = true
+                    if (lex['flag'] == 's') then
+                        return true
+                    elseif (lex['flag'] == 'c') then
+                        c_flag = true
+                    end
+                end
+            end
+        -- equal match
+        elseif vlist[1] == 'eq' then
+            for _header_name, _header_value in pairs(self.headers) do
+                if (lex['key'] == 'header_name') then
+                    check_v = _header_name
+                else
+                    check_v = _header_value
+                end
+                if vlist[2] == check_v then
+                    header_flag = true
+                    if (lex['flag'] == 's') then
+                        return true
+                    elseif (lex['flag'] == 'c') then
+                        c_flag = true
+                    end
+                end
+            end
+        end
+        if not header_flag then
             return false
         end
     end

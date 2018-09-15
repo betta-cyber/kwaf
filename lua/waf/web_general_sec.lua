@@ -23,6 +23,7 @@ function _M.xss_rule()
         ngx.log(ngx.INFO, "rule id "..rule.rule_id)
         xss_res = waf_engine:run(rule.content)
         if xss_res then
+            ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
             return true
         end
     end
@@ -37,12 +38,14 @@ function _M.sql_injection()
         ngx.log(ngx.INFO, "rule id "..rule.rule_id)
         sql_injection_res = waf_engine:run(rule.content)
         if sql_injection_res then
+            ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
             return true
         end
     end
     return false
 end
 
+-- main function
 function _M.check(self)
     if self:xss_rule() then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
