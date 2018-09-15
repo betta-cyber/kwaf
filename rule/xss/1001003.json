@@ -5,11 +5,6 @@
         "flag": "s",
         "value":  [
             {
-                "key":"uri",
-                "value":"re:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
-                "flag":"s"
-            },
-            {
                 "key":"cookie",
                 "value":"re:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
                 "flag":"s"

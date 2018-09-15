@@ -35,6 +35,29 @@ function _M.run(self, rule)
     return self:parser(rule)
 end
 
+-- v1 input value
+-- v2 rule value
+-- keyword
+function _M.syntax(self, keyword, v1, v2)
+    if keyword == 'belong' then
+        belong_list = split(string.sub(v2, 2, -2), ',')
+        for _, bv in pairs(belong_list) do
+            if string.lower(bv) == string.lower(v1) then
+                return true
+            end
+        end
+    elseif keyword == 'eq' then
+        if string.lower(v1) == string.lower(v2) then
+            return true
+        end
+    elseif keyword == 're' then
+        if rulematch(v1, v2, "jo") then
+            return true
+        end
+    end
+    return false
+end
+
 -- todo:
 -- need add not regular and not equal and exists and not exists and not belong
 -- and type and between and length between and count between
@@ -51,104 +74,60 @@ function _M.parser(self, lex)
     if lex['key'] == 'method' then
         ngx.log(ngx.INFO, "method check")
         local vlist = split(lex['value'], ':')
-        if vlist[1] == 'belong' then
-            belong_list = split(string.sub(vlist[2], 2, -2), ',')
-            local _match = false
-            for _, bv in pairs(belong_list) do
-                if string.lower(bv) == string.lower(self.method) then
-                    _match = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
-                        break
-                    end
-                end
-            end
-            -- not belong
-            if( _match == false) then
-                return false
+        local _match = self:syntax(vlist[1], self.method, vlist[2])
+        if _match then
+            if (lex['flag'] == 's') then
+                return true
+            elseif (lex['flag'] == 'c') then
+                c_flag = true
             end
         end
-        if vlist[1] == 'eq' then
-            local _match = false
-            if string.lower(vlist[2]) == string.lower(self.method) then
-                _match = true
-                if (lex['flag'] == 's') then
-                    return true
-                elseif (lex['flag'] == 'c') then
-                    c_flag = true
-                end
-            end
-            if( _match == false) then
-                return false
-            end
+        -- not match
+        if( _match == false) then
+            return false
         end
     end
+    -- this conditions is for uri.
     -- uri check
     if lex['key'] == 'uri' then
         ngx.log(ngx.INFO, "uri check")
         local vlist = split(lex['value'], ':')
-        -- regex match
-        if vlist[1] == 're' then
-            if rulematch(self.uri, vlist[2], "jo") then
-                if (lex['flag'] == 's') then
-                    return true
-                elseif (lex['flag'] == 'c') then
-                    c_flag = true
-                end
-            else
-                return false
-            end
-        elseif vlist[1] == 'eq' then
-            if vlist[2] == self.uri then
-                if (lex['flag'] == 's') then
-                    return true
-                elseif (lex['flag'] == 'c') then
-                    c_flag = true
-                end
-            else
-                return false
+        local _match = self:syntax(vlist[1], self.uri, vlist[2])
+        -- match rule
+        if _match then
+            if (lex['flag'] == 's') then
+                return true
+            elseif (lex['flag'] == 'c') then
+                c_flag = true
             end
         end
+        -- not match
+        if( _match == false) then
+            return false
+        end
     end
-    -- this Conditions is for args.
+    -- this conditions is for args.
     -- include check for arg name and arg value.
     if lex['key'] == 'arg' or lex['key'] == 'arg-name' then
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local arg_flag = false
-        -- regex match
-        if vlist[1] == 're' then
-            for _arg_name, _arg_value in pairs(self.args) do
-                if lex['key'] == 'arg-name' then
-                    check_v = _arg_name
-                else
-                    check_v = _arg_value
-                end
-                if rulematch(check_v, vlist[2], "jo") then
-                    arg_flag = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
-                    end
-                end
+
+        for _arg_name, _arg_value in pairs(self.args) do
+            -- check for arg name
+            if lex['key'] == 'arg-name' then
+                check_v = _arg_name
+            -- check for arg value
+            else
+                check_v = _arg_value
             end
-        elseif vlist[1] == 'eq' then
-            for _arg_name, _arg_value in pairs(self.args) do
-                if lex['key'] == 'arg-name' then
-                    check_v = _arg_name
-                else
-                    check_v = _arg_value
-                end
-                if vlist[2] == check_v then
-                    arg_flag = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
-                    end
+            local _match = self:syntax(vlist[1], check_v, vlist[2])
+            if _match then
+                arg_flag = true
+                if (lex['flag'] == 's') then
+                    return true
+                elseif (lex['flag'] == 'c') then
+                    c_flag = true
                 end
             end
         end
@@ -162,38 +141,20 @@ function _M.parser(self, lex)
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local cookie_flag = false
-        -- regex match
-        if vlist[1] == 're' then
-            for _cookie_name, _cookie_value in pairs(self.cookies) do
-                if (lex['key'] == 'cookie_name') then
-                    check_v = _cookie_name
-                else
-                    check_v = _cookie_value
-                end
-                if rulematch(check_v, vlist[2], "jo") then
-                    cookie_flag = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
-                    end
-                end
+        
+        for _cookie_name, _cookie_value in pairs(self.cookies) do
+            if (lex['key'] == 'cookie_name') then
+                check_v = _cookie_name
+            else
+                check_v = _cookie_value
             end
-        -- equal match
-        elseif vlist[1] == 'eq' then
-            for _cookie_name, _cookie_value in pairs(self.cookies) do
-                if (lex['key'] == 'cookie_name') then
-                    check_v = _cookie_name
-                else
-                    check_v = _cookie_value
-                end
-                if vlist[2] == check_v then
-                    cookie_flag = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
-                    end
+            local _match = self:syntax(vlist[1], check_v, vlist[2])
+            if _match then
+                cookie_flag = true
+                if (lex['flag'] == 's') then
+                    return true
+                elseif (lex['flag'] == 'c') then
+                    c_flag = true
                 end
             end
         end
@@ -206,38 +167,20 @@ function _M.parser(self, lex)
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local header_flag = false
-        -- regex match
-        if vlist[1] == 're' then
-            for _header_name, _header_value in pairs(self.headers) do
-                if (lex['key'] == 'header_name') then
-                    check_v = _header_name
-                else
-                    check_v = _header_value
-                end
-                if rulematch(check_v, vlist[2], "jo") then
-                    header_flag = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
-                    end
-                end
+
+        for _header_name, _header_value in pairs(self.headers) do
+            if (lex['key'] == 'header_name') then
+                check_v = _header_name
+            else
+                check_v = _header_value
             end
-        -- equal match
-        elseif vlist[1] == 'eq' then
-            for _header_name, _header_value in pairs(self.headers) do
-                if (lex['key'] == 'header_name') then
-                    check_v = _header_name
-                else
-                    check_v = _header_value
-                end
-                if vlist[2] == check_v then
-                    header_flag = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
-                    end
+            local _match = self:syntax(vlist[1], check_v, vlist[2])
+            if _match then
+                header_flag = true
+                if (lex['flag'] == 's') then
+                    return true
+                elseif (lex['flag'] == 'c') then
+                    c_flag = true
                 end
             end
         end
