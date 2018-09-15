@@ -1,0 +1,27 @@
+{
+    "rule_id":2001003,
+    "enable": true,
+    "content":
+    {
+        "key": "single",
+        "value": [
+            {
+                "key":"uri",
+                "value":"re:(?i)database[\\s\\xa0\\x00-\\x1f]*\\(",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"re:(?i)database[\\s\\xa0\\x00-\\x1f]*\\(",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"re:(?i)database[\\s\\xa0\\x00-\\x1f]*\\(",
+                "flag":"s"
+            }
+        ],
+        "flag": "s"
+    },
+    "desc": "The database() function is used in some databases to return information about the database"
+}

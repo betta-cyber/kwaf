@@ -1,8 +1,10 @@
 {
     "rule_id":2001001,
+    "enable": true,
     "content":{
         "key":"arg",
         "value":"re:(?i)\\\\([0-7]{3}|x[0-9a-f]{2})",
         "flag":"s"
-    }
+    },
+    "desc": "The backslash often used to escape certain special characters in the sql"
 }

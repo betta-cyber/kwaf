@@ -70,7 +70,22 @@ function _M.parser(self, lex)
                 return false
             end
         end
+        if vlist[1] == 'eq' then
+            local _match = false
+            if string.lower(vlist[2]) == string.lower(self.method) then
+                _match = true
+                if (lex['flag'] == 's') then
+                    return true
+                elseif (lex['flag'] == 'c') then
+                    c_flag = true
+                end
+            end
+            if( _match == false) then
+                return false
+            end
+        end
     end
+    -- uri check
     if lex['key'] == 'uri' then
         ngx.log(ngx.INFO, "uri check")
         local vlist = split(lex['value'], ':')
@@ -186,6 +201,7 @@ function _M.parser(self, lex)
             return false
         end
     end
+    -- header check
     if lex['key'] == 'header' or lex['key'] == 'header_name' then
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')

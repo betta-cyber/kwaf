@@ -1,0 +1,24 @@
+{
+    "rule_id":10010103,
+    "content": {
+        "key":"single",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"uri",
+                "value":"re:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"re:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"re:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
+                "flag":"s"
+            }
+        ]
+    }
+}

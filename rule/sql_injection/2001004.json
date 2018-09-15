@@ -1,0 +1,27 @@
+{
+    "rule_id":2001004,
+    "enable": true,
+    "content":
+    {
+        "key": "single",
+        "value": [
+            {
+                "key":"uri",
+                "value":"re:(?i)drop[\\s\\xa0\\x00-\\x1f]+table[\\[\\s\\xa0\\x00-\\x1f]+",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"re:(?i)drop[\\s\\xa0\\x00-\\x1f]+table[\\[\\s\\xa0\\x00-\\x1f]+",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"re:(?i)drop[\\s\\xa0\\x00-\\x1f]+table[\\[\\s\\xa0\\x00-\\x1f]+",
+                "flag":"s"
+            }
+        ],
+        "flag": "s"
+    },
+    "desc": "drop table"
+}
