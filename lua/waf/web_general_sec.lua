@@ -29,8 +29,25 @@ function _M.xss_rule()
     return false
 end
 
+function _M.sql_injection()
+    local SQL_INJECTION_RULES_JSON = get_rule('sql_injection')
+    local SQL_INJECTION_RULES = cjson.decode(SQL_INJECTION_RULES_JSON);
+    local waf_engine = engine:new()
+    for _, rule in pairs(SQL_INJECTION_RULES) do
+        ngx.log(ngx.INFO, "rule id "..rule.rule_id)
+        sql_injection_res = waf_engine:run(rule.content)
+        if sql_injection_res then
+            return true
+        end
+    end
+    return false
+end
+
 function _M.check(self)
     if self:xss_rule() then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:sql_injection() then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
     -- if all rule pass

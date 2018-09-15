@@ -1,5 +1,5 @@
 {
-    "rule_id":1310100,
+    "rule_id":1001001,
     "content":{
         "key":"method",
         "value":"belong:[get,post]",

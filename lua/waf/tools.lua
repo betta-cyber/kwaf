@@ -42,7 +42,7 @@ function get_rule(ruledirname)
     local cjson = require "cjson";
     -- local RULE_PATH = config_rule_dir
     local RULE_PATH = '/Users/shokill/kwaf/rule'
-    local RULE_DIR = RULE_PATH..'/'..ruledirname..'_rule'
+    local RULE_DIR = RULE_PATH..'/'..ruledirname
 
     if RULE_DIR == nil then
         return

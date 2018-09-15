@@ -71,7 +71,7 @@ function _M.parser(self, lex)
         ngx.log(ngx.INFO, "uri check")
         local vlist = split(lex['value'], ':')
         -- regex match
-        if vlist[1] == 'co' then
+        if vlist[1] == 're' then
             if rulematch(self.uri, vlist[2], "jo") then
                 if (lex['flag'] == 's') then
                     return true
@@ -93,14 +93,21 @@ function _M.parser(self, lex)
             end
         end
     end
-    if lex['key'] == 'arg' then
-        ngx.log(ngx.INFO, "arg check")
+    -- this Conditions is for args.
+    -- include check for arg name and arg value.
+    if lex['key'] == 'arg' or lex['key'] == 'arg-name' then
+        ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local arg_flag = false
         -- regex match
-        if vlist[1] == 'co' then
+        if vlist[1] == 're' then
             for _arg_name, _arg_value in pairs(self.args) do
-                if rulematch(_arg_value, vlist[2], "jo") then
+                if lex['key'] == 'arg-name' then
+                    check_v = _arg_name
+                else
+                    check_v = _arg_value
+                end
+                if rulematch(check_v, vlist[2], "jo") then
                     arg_flag = true
                     if (lex['flag'] == 's') then
                         return true
@@ -111,7 +118,12 @@ function _M.parser(self, lex)
             end
         elseif vlist[1] == 'eq' then
             for _arg_name, _arg_value in pairs(self.args) do
-                if vlist[2] == _arg_value then
+                if lex['key'] == 'arg-name' then
+                    check_v = _arg_name
+                else
+                    check_v = _arg_value
+                end
+                if vlist[2] == check_v then
                     arg_flag = true
                     if (lex['flag'] == 's') then
                         return true
@@ -125,14 +137,21 @@ function _M.parser(self, lex)
             return false
         end
     end
-    if lex['key'] == 'cookie' then
-        ngx.log(ngx.INFO, "cookie check")
+    -- this Conditions is for cookies.
+    -- include check for cookie name and cookie value.
+    if lex['key'] == 'cookie' or lex['key'] == 'cookie_name' then
+        ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local cookie_flag = false
         -- regex match
-        if vlist[1] == 'co' then
+        if vlist[1] == 're' then
             for _cookie_name, _cookie_value in pairs(self.cookies) do
-                if rulematch(_cookie_value, vlist[2], "jo") then
+                if (lex['key'] == 'cookie_name') then
+                    check_v = _cookie_name
+                else
+                    check_v = _cookie_value
+                end
+                if rulematch(check_v, vlist[2], "jo") then
                     cookie_flag = true
                     if (lex['flag'] == 's') then
                         return true
@@ -141,9 +160,15 @@ function _M.parser(self, lex)
                     end
                 end
             end
+        -- equal match
         elseif vlist[1] == 'eq' then
             for _cookie_name, _cookie_value in pairs(self.cookies) do
-                if vlist[2] == _cookie_value then
+                if (lex['key'] == 'cookie_name') then
+                    check_v = _cookie_name
+                else
+                    check_v = _cookie_value
+                end
+                if vlist[2] == check_v then
                     cookie_flag = true
                     if (lex['flag'] == 's') then
                         return true
@@ -157,13 +182,31 @@ function _M.parser(self, lex)
             return false
         end
     end
-    -- this is for multiline check. and you can think it is "&"
+    -- this is single check. and you can think it is "or"
+    if lex['key'] == 'single' then
+        ngx.log(ngx.INFO, "single check")
+        local single_flag = false
+        for _, lv in pairs(lex['value']) do
+            single_flag = (single_flag or self:parser(lv))
+            ngx.log(ngx.DEBUG, "current single flag: ", single_flag)
+        end
+        if single_flag then
+            if(lex['flag'] == 's') then
+                return true
+            elseif(lex['flag'] == 'c') then
+                c_flag = true
+            end
+        else
+            return false
+        end
+    end
+    -- this is for multiline check. and you can think it is "and"
     if lex['key'] == 'multiline' then
         ngx.log(ngx.INFO, "multiline check")
         local mulit_flag = true
         for _, lv in pairs(lex['value']) do
             mulit_flag = (mulit_flag and self:parser(lv))
-            ngx.log(ngx.DEBUG, "current mulit_flag: ", v_flag)
+            ngx.log(ngx.DEBUG, "current mulit flag: ", mulit_flag)
         end
         if mulit_flag then
             if(lex['flag'] == 's') then
@@ -190,109 +233,5 @@ function _M.parser(self, lex)
     -- if no match return false
     return false
 end
-
-    -- for k, v in pairs(rule) do
-        -- local rule_part_flag = false
-        -- if k == 'method' then
-            -- local method_flag = false
-            -- local _method = string.lower(method)
-            -- -- waf http method check
-            -- if (v['match'] == 'eq') then
-                -- for _, method_v in pairs(v['value']) do
-                    -- if method_v == _method then
-                        -- if (v["flag"] == 'b') then
-                            -- return true
-                        -- elseif(v["flag"] == 'c') then
-                            -- rule_part_flag = true
-                        -- end
-                    -- end
-                -- end
-            -- elseif (v['match'] == 'co') then
-                -- for _, method_v in pairs(v['value']) do
-                    -- if rulematch(_method, method_v, "jo") then
-                        -- if (v["flag"] == 'b') then
-                            -- return true
-                        -- elseif(v["flag"] == 'c') then
-                            -- rule_part_flag = true
-                        -- end
-                    -- end
-                -- end
-            -- end
-        -- -- waf check uri part
-        -- elseif k == 'uri' then
-            -- if (v["match"] == 'co') then
-                -- if rulematch(uri, v["value"], "jo") then
-                    -- if (v["flag"] == 'b') then
-                        -- return true
-                    -- elseif(v["flag"] == 'c') then
-                        -- rule_part_flag = true
-                    -- end
-                -- end
-            -- end
-            -- if (v["match"] == 'eq') then
-                -- if v["value"] == uri then
-                    -- if (v["flag"] == 'b') then
-                        -- return true
-                    -- elseif(v["flag"] == 'c') then
-                        -- rule_part_flag = true
-                    -- end
-                -- end
-            -- end
-        -- -- waf check arg part
-        -- elseif k == 'arg' then
-            -- if (v["match"] == 'co') then
-                -- for key, value in pairs(args) do
-                    -- if rulematch(value, v["value"], "jo") then
-                        -- rule_part_flag = true
-                        -- if (v["flag"] == 'b') then
-                            -- return true
-                        -- end
-                    -- end
-                -- end
-            -- end
-            -- if (v["match"] == 'eq') then
-                -- for key, value in pairs(args) do
-                    -- if v["value"] == value then
-                        -- rule_part_flag = true
-                        -- if (v["flag"] == 'b') then
-                            -- return true
-                        -- end
-                    -- end
-                -- end
-            -- end
-        -- -- waf check cookie part
-        -- elseif k == 'cookie' then
-            -- print(111)
-            -- if (v["match"] == 'co') then
-                -- for key, value in pairs(cookies) do
-                    -- print(value)
-                    -- print(v["value"])
-                    -- if rulematch(value, v["value"], "jo") then
-                        -- rule_part_flag = true
-                        -- if (v["flag"] == 'b') then
-                            -- return true
-                        -- end
-                    -- end
-                -- end
-            -- end
-            -- if (v["match"] == 'eq') then
-                -- for key, value in pairs(cookies) do
-                    -- if v["value"] == value then
-                        -- rule_part_flag = true
-                        -- if (v["flag"] == 'b') then
-                            -- return true
-                        -- end
-                    -- end
-                -- end
-            -- end
-        -- end
-        -- print(rule_part_flag)
-        -- if not rule_part_flag then
-            -- rule_check_flag = false
-            -- -- break loop
-            -- break
-        -- end
-    -- end
-    -- return rule_check_flag
 
 return _M
