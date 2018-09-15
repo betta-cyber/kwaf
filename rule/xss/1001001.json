@@ -1,5 +1,6 @@
 {
     "rule_id":1001001,
+    "enable": true,
     "content":{
         "key":"method",
         "value":"belong:[get,post]",

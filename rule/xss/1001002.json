@@ -1,5 +1,6 @@
 {
     "rule_id":10010102,
+    "enable": true,
     "content": {
         "key":"single",
         "flag": "s",

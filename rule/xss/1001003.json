@@ -1,19 +1,35 @@
 {
-    "rule_id":10010103,
+    "rule_id": 10010103,
+    "enable": true,
     "content": {
-        "key":"single",
+        "key": "single",
         "flag": "s",
         "value":  [
             {
                 "key":"cookie",
-                "value":"re:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
-                "flag":"s"
+                "value": "lnbetw:0,5",
+                "flag": "c",
+                "next": [
+                    {
+                        "key":"cookie",
+                        "value":"re:(?is)style.*?=.*?\\\/\\*.*\\*",
+                        "flag":"s"
+                    }
+                ]
             },
             {
                 "key":"arg",
-                "value":"re:(?is)<\\s*?((i)?frame)[\\s\\\/]+?.*?src\\s*=",
-                "flag":"s"
+                "value": "lnbetw:0,5",
+                "flag": "c",
+                "next": [
+                    {
+                        "key":"arg",
+                        "value":"re:(?is)style.*?=.*?\\\/\\*.*\\*",
+                        "flag":"s"
+                    }
+                ]
             }
         ]
-    }
+    },
+    "desc": "css的注释可以被用来绕过WAF的css相关xss规则,开启可以对css注释进行检测"
 }

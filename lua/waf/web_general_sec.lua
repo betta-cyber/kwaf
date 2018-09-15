@@ -20,11 +20,13 @@ function _M.xss_rule()
     local XSS_RULES = cjson.decode(XSS_RULES_JSON);
     local waf_engine = engine:new()
     for _, rule in pairs(XSS_RULES) do
-        ngx.log(ngx.INFO, "rule id "..rule.rule_id)
-        xss_res = waf_engine:run(rule.content)
-        if xss_res then
-            ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
-            return true
+        if rule.enable then
+            ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
+            xss_res = waf_engine:run(rule.content)
+            if xss_res then
+                ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
+                return true
+            end
         end
     end
     return false
@@ -35,11 +37,13 @@ function _M.sql_injection()
     local SQL_INJECTION_RULES = cjson.decode(SQL_INJECTION_RULES_JSON);
     local waf_engine = engine:new()
     for _, rule in pairs(SQL_INJECTION_RULES) do
-        ngx.log(ngx.INFO, "rule id "..rule.rule_id)
-        sql_injection_res = waf_engine:run(rule.content)
-        if sql_injection_res then
-            ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
-            return true
+        if rule.enable then
+            ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
+            sql_injection_res = waf_engine:run(rule.content)
+            if sql_injection_res then
+                ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
+                return true
+            end
         end
     end
     return false

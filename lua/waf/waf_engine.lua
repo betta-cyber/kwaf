@@ -38,8 +38,12 @@ end
 -- v1 input value
 -- v2 rule value
 -- keyword
+-- todo:
+-- need add not regular and not equal and exists and not exists and not belong
+-- and type and between and length between and count between
 function _M.syntax(self, keyword, v1, v2)
     if keyword == 'belong' then
+        -- belong to list, Surrounded by []
         belong_list = split(string.sub(v2, 2, -2), ',')
         for _, bv in pairs(belong_list) do
             if string.lower(bv) == string.lower(v1) then
@@ -47,21 +51,68 @@ function _M.syntax(self, keyword, v1, v2)
             end
         end
     elseif keyword == 'eq' then
+        -- full equal
+        if v1 == v2 then
+            return true
+        end
+    elseif keyword == 'neq' then
+        -- not full equal
+        if v1 ~= v2 then
+            return true
+        end
+    elseif keyword == 'req' then
+        -- ignore case equal
         if string.lower(v1) == string.lower(v2) then
             return true
         end
+    elseif keyword == 'nreq' then
+        -- not ignore case equal
+        if string.lower(v1) ~= string.lower(v2) then
+            return true
+        end
     elseif keyword == 're' then
+        -- regular match
         if rulematch(v1, v2, "jo") then
+            return true
+        end
+    elseif keyword == 'nre' then
+        -- not regular match
+        if not rulematch(v1, v2, "jo") then
+            return true
+        end
+    elseif keyword == 'lbetw' then
+        -- length between a list split by ,
+        length = string.len(v1)
+        length_range = split(v2, ',')
+        if length > tonumber(length_range[1]) and length < tonumber(length_range[2]) then
+            return true
+        end
+    elseif keyword == 'lnbetw' then
+        -- length not between a list split by ,
+        length = string.len(v1)
+        length_range = split(v2, ',')
+        if length < tonumber(length_range[1]) or length > tonumber(length_range[2]) then
+            return true
+        end
+    elseif keyword == 'cbetw' then
+        -- count between
+        count = table.getn(v1)
+        count_range = split(v2, ',')
+        if count > tonumber(count_range[1]) and count < tonumber(count_range[2]) then
+            return true
+        end
+    elseif keyword == 'cnbetw' then
+        -- count not between
+        count = table.getn(v1)
+        count_range = split(v2, ',')
+        if count < tonumber(count_range[1]) or count > tonumber(count_range[2]) then
             return true
         end
     end
     return false
 end
 
--- todo:
--- need add not regular and not equal and exists and not exists and not belong
--- and type and between and length between and count between
-
+-- parser json content
 function _M.parser(self, lex)
     ngx.log(ngx.INFO, "--------"..lex['key'].."--------")
     -- c flag means continue , if c flag is true, this rule will go on to check
@@ -141,7 +192,7 @@ function _M.parser(self, lex)
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local cookie_flag = false
-        
+
         for _cookie_name, _cookie_value in pairs(self.cookies) do
             if (lex['key'] == 'cookie_name') then
                 check_v = _cookie_name
