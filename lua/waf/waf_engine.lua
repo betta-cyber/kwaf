@@ -193,19 +193,22 @@ function _M.parser(self, lex)
         local vlist = split(lex['value'], ':')
         local cookie_flag = false
 
-        for _cookie_name, _cookie_value in pairs(self.cookies) do
-            if (lex['key'] == 'cookie_name') then
-                check_v = _cookie_name
-            else
-                check_v = _cookie_value
-            end
-            local _match = self:syntax(vlist[1], check_v, vlist[2])
-            if _match then
-                cookie_flag = true
-                if (lex['flag'] == 's') then
-                    return true
-                elseif (lex['flag'] == 'c') then
-                    c_flag = true
+        -- if cookies exists
+        if self.cookies then
+            for _cookie_name, _cookie_value in pairs(self.cookies) do
+                if (lex['key'] == 'cookie_name') then
+                    check_v = _cookie_name
+                else
+                    check_v = _cookie_value
+                end
+                local _match = self:syntax(vlist[1], check_v, vlist[2])
+                if _match then
+                    cookie_flag = true
+                    if (lex['flag'] == 's') then
+                        return true
+                    elseif (lex['flag'] == 'c') then
+                        c_flag = true
+                    end
                 end
             end
         end
@@ -264,6 +267,9 @@ function _M.parser(self, lex)
         for _, lv in pairs(lex['value']) do
             mulit_flag = (mulit_flag and self:parser(lv))
             ngx.log(ngx.DEBUG, "current mulit flag: ", mulit_flag)
+            if not mulit_flag then
+                return true
+            end
         end
         if mulit_flag then
             if(lex['flag'] == 's') then
@@ -271,8 +277,6 @@ function _M.parser(self, lex)
             elseif(lex['flag'] == 'c') then
                 c_flag = true
             end
-        else
-            return false
         end
     end
     -- this is for single continue check. and you can think it is "|"

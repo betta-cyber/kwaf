@@ -3,17 +3,17 @@
     "enable": true,
     "content":{
         "key":"method",
-        "value":"belong:[get,post]",
+        "value":"belong:[delete,post]",
         "flag":"c",
         "next":[
             {
                 "key":"uri",
-                "value":"co:/ddd",
+                "value":"re:/xxx",
                 "flag":"s"
             },
             {
                 "key":"cookie",
-                "value":"co:xxx",
+                "value":"re:xxx",
                 "flag":"s"
             },
             {
