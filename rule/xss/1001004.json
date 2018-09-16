@@ -1,0 +1,64 @@
+{
+    "rule_id": 10010104,
+    "enable": true,
+    "content": {
+        "key": "single",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"uri",
+                "value": "re:(?is)(on(input|Abort|Activate|(after|before)(Print|update)|(beforeun|un)?load|Begin|Blur|Bounce|CellChange|ContextMenu|ControlSelect|Copy|Cut|Data(Available|SetChanged|SetComplete)|Drag(End|Leave|Enter|Over|Drop)?|End|Error(Update)?|FilterChange|Finish|Focus(In|Out)?|Help|LayoutComplete|Lose(Capture)?|Media(Complete|Error)?|Move(End|Start)?|message|OutOfSync|Paste|popstate|PropertyChange|ReadyStateChange|Repeat|Reset|Resume|Reverse|RowsEnter|RowExit|RowDelete|RowInserted|resize(end|start)?|Select(ionChange|Start)?|Start|Stop|SyncRestored|Submit|TimeError|TrackChange|(un)?URLFlip|seekSegmentTime|storage|hash?change|(on|off)line|page(hide|show)|(re|un)do|key(down|press|up)|drop|(dbl)?click|drag(end|enter|leave|over|start)?|drop|mouse(down|move|out|over|up|wheel)|scroll|canplay(through)?|durationchange|e(mpti|nd)ed|load((ed(meta)?data)|start)|pause|play(ing)?|progress|(rate|readystate|volume)change|seek(ed|ing)|stalled|suspend|timeupdate|waiting)|seekSegmentTime|ReadyStateChange)\\W*(=|\")",
+                "flag": "s"
+            },
+            {
+                "key":"multiline",
+                "value":[
+                    {
+                        "key":"arg",
+                        "value":"re:(?is)(on(input|Abort|Activate|(after|before)(Print|update)|(beforeun|un)?load|Begin|Blur|Bounce|CellChange|ContextMenu|ControlSelect|Copy|Cut|Data(Available|SetChanged|SetComplete)|Drag(End|Leave|Enter|Over|Drop)?|End|Error(Update)?|FilterChange|Finish|Focus(In|Out)?|Help|LayoutComplete|Lose(Capture)?|Media(Complete|Error)?|Move(End|Start)?|message|OutOfSync|Paste|popstate|PropertyChange|ReadyStateChange|Repeat|Reset|Resume|Reverse|RowsEnter|RowExit|RowDelete|RowInserted|resize(end|start)?|Select(ionChange|Start)?|Start|Stop|SyncRestored|Submit|TimeError|TrackChange|(un)?URLFlip|seekSegmentTime|storage|hash?change|(on|off)line|page(hide|show)|(re|un)do|key(down|press|up)|drop|(dbl)?click|drag(end|enter|leave|over|start)?|drop|mouse(down|move|out|over|up|wheel)|scroll|canplay(through)?|durationchange|e(mpti|nd)ed|load((ed(meta)?data)|start)|pause|play(ing)?|progress|(rate|readystate|volume)change|seek(ed|ing)|stalled|suspend|timeupdate|waiting)|seekSegmentTime|ReadyStateChange)\\W*(=|\")",
+                        "flag":"s"
+                    },
+                    {
+                        "key":"arg",
+                        "value":"nlbetw:0,5",
+                        "flag":"s"
+                    }
+                ],
+                "flag":"s"
+            },
+            {
+                "key":"multiline",
+                "value":[
+                    {
+                        "key":"arg-name",
+                        "value":"re:(?is)(on(input|Abort|Activate|(after|before)(Print|update)|(beforeun|un)?load|Begin|Blur|Bounce|CellChange|ContextMenu|ControlSelect|Copy|Cut|Data(Available|SetChanged|SetComplete)|Drag(End|Leave|Enter|Over|Drop)?|End|Error(Update)?|FilterChange|Finish|Focus(In|Out)?|Help|LayoutComplete|Lose(Capture)?|Media(Complete|Error)?|Move(End|Start)?|message|OutOfSync|Paste|popstate|PropertyChange|ReadyStateChange|Repeat|Reset|Resume|Reverse|RowsEnter|RowExit|RowDelete|RowInserted|resize(end|start)?|Select(ionChange|Start)?|Start|Stop|SyncRestored|Submit|TimeError|TrackChange|(un)?URLFlip|seekSegmentTime|storage|hash?change|(on|off)line|page(hide|show)|(re|un)do|key(down|press|up)|drop|(dbl)?click|drag(end|enter|leave|over|start)?|drop|mouse(down|move|out|over|up|wheel)|scroll|canplay(through)?|durationchange|e(mpti|nd)ed|load((ed(meta)?data)|start)|pause|play(ing)?|progress|(rate|readystate|volume)change|seek(ed|ing)|stalled|suspend|timeupdate|waiting)|seekSegmentTime|ReadyStateChange)\\W*(=|\")",
+                        "flag":"s"
+                    },
+                    {
+                        "key":"arg-name",
+                        "value":"nlbetw:0,5",
+                        "flag":"s"
+                    }
+                ],
+                "flag":"s"
+            },
+            {
+                "key":"multiline",
+                "value":[
+                    {
+                        "key":"cookie",
+                        "value":"re:(?is)(on(input|Abort|Activate|(after|before)(Print|update)|(beforeun|un)?load|Begin|Blur|Bounce|CellChange|ContextMenu|ControlSelect|Copy|Cut|Data(Available|SetChanged|SetComplete)|Drag(End|Leave|Enter|Over|Drop)?|End|Error(Update)?|FilterChange|Finish|Focus(In|Out)?|Help|LayoutComplete|Lose(Capture)?|Media(Complete|Error)?|Move(End|Start)?|message|OutOfSync|Paste|popstate|PropertyChange|ReadyStateChange|Repeat|Reset|Resume|Reverse|RowsEnter|RowExit|RowDelete|RowInserted|resize(end|start)?|Select(ionChange|Start)?|Start|Stop|SyncRestored|Submit|TimeError|TrackChange|(un)?URLFlip|seekSegmentTime|storage|hash?change|(on|off)line|page(hide|show)|(re|un)do|key(down|press|up)|drop|(dbl)?click|drag(end|enter|leave|over|start)?|drop|mouse(down|move|out|over|up|wheel)|scroll|canplay(through)?|durationchange|e(mpti|nd)ed|load((ed(meta)?data)|start)|pause|play(ing)?|progress|(rate|readystate|volume)change|seek(ed|ing)|stalled|suspend|timeupdate|waiting)|seekSegmentTime|ReadyStateChange)\\W*(=|\")",
+                        "flag":"s"
+                    },
+                    {
+                        "key":"cookie",
+                        "value":"nlbetw:0,5",
+                        "flag":"s"
+                    }
+                ],
+                "flag":"s"
+            }
+        ]
+    },
+    "desc": "dom事件代码过滤"
+}

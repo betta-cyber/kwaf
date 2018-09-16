@@ -7,7 +7,7 @@
         "value":  [
             {
                 "key":"cookie",
-                "value": "lnbetw:0,5",
+                "value": "nlbetw:0,5",
                 "flag": "c",
                 "next": [
                     {
@@ -19,7 +19,7 @@
             },
             {
                 "key":"arg",
-                "value": "lnbetw:0,5",
+                "value": "nlbetw:0,5",
                 "flag": "c",
                 "next": [
                     {

@@ -37,12 +37,12 @@ function split(inputstr, sep)
 end
 
 function get_rule(ruledirname)
-    require 'config'
+    local config = require 'config'
     local lfs = require 'lfs'
     local io = require 'io'
     local cjson = require "cjson";
     -- local RULE_PATH = config_rule_dir
-    local RULE_DIR = config_rule_dir..'/'..ruledirname
+    local RULE_DIR = config.rule_dir..'/'..ruledirname
 
     if RULE_DIR == nil then
         return

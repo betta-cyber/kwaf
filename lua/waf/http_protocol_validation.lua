@@ -1,5 +1,5 @@
-require "waf/tools"
-require "resty.core.regex"
+local tools = require "waf/tools"
+local regex = require "resty.core.regex"
 -- need cookie plugin https://github.com/cloudflare/lua-resty-cookie
 local ck = require "resty.cookie"
 

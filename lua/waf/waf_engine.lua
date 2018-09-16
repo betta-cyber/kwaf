@@ -1,5 +1,5 @@
-require "waf/tools"
-require "resty.core.regex"
+local tools = require "waf/tools"
+local regex require "resty.core.regex"
 local ck = require "resty.cookie"
 
 local rulematch = ngx.re.find
@@ -87,8 +87,8 @@ function _M.syntax(self, keyword, v1, v2)
         if length > tonumber(length_range[1]) and length < tonumber(length_range[2]) then
             return true
         end
-    elseif keyword == 'lnbetw' then
-        -- length not between a list split by ,
+    elseif keyword == 'nlbetw' then
+        -- not length between a list split by ,
         length = string.len(v1)
         length_range = split(v2, ',')
         if length < tonumber(length_range[1]) or length > tonumber(length_range[2]) then
@@ -101,8 +101,8 @@ function _M.syntax(self, keyword, v1, v2)
         if count > tonumber(count_range[1]) and count < tonumber(count_range[2]) then
             return true
         end
-    elseif keyword == 'cnbetw' then
-        -- count not between
+    elseif keyword == 'ncbetw' then
+        -- not count between
         count = table.getn(v1)
         count_range = split(v2, ',')
         if count < tonumber(count_range[1]) or count > tonumber(count_range[2]) then
@@ -249,16 +249,16 @@ function _M.parser(self, lex)
         for _, lv in pairs(lex['value']) do
             single_flag = (single_flag or self:parser(lv))
             ngx.log(ngx.DEBUG, "current single flag: ", single_flag)
-        end
-        if single_flag then
-            if(lex['flag'] == 's') then
-                return true
-            elseif(lex['flag'] == 'c') then
-                c_flag = true
+            -- if single flag become true, no need to contoune
+            if single_flag then
+                if(lex['flag'] == 's') then
+                    return true
+                elseif(lex['flag'] == 'c') then
+                    c_flag = true
+                end
             end
-        else
-            return false
         end
+        return single_flag
     end
     -- this is for multiline check. and you can think it is "and"
     if lex['key'] == 'multiline' then
@@ -268,7 +268,7 @@ function _M.parser(self, lex)
             mulit_flag = (mulit_flag and self:parser(lv))
             ngx.log(ngx.DEBUG, "current mulit flag: ", mulit_flag)
             if not mulit_flag then
-                return true
+                return false
             end
         end
         if mulit_flag then

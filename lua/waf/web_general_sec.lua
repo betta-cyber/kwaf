@@ -1,5 +1,5 @@
-require "waf/tools"
-require "resty.core.regex"
+local tools = require "waf/tools"
+local regex = require "resty.core.regex"
 local cjson = require "cjson";
 local engine = require "waf/waf_engine"
 
