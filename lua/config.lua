@@ -9,6 +9,8 @@ local _M = {
     http_protocol_validation = true,
     --enable/disable web_general_sec
     web_general_sec = true,
+    --enable/disable upload_limit
+    upload_limit = true,
 }
 
 return _M

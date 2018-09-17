@@ -1,5 +1,4 @@
 local tools = require "waf/tools"
-local regex = require "resty.core.regex"
 local cjson = require "cjson";
 local engine = require "waf/waf_engine"
 
@@ -24,7 +23,7 @@ function _M.xss_rule()
             ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
             xss_res = waf_engine:run(rule.content)
             if xss_res then
-                ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
+                ngx.log(ngx.INFO, "!!! rule match !!! "..rule.rule_id)
                 return true
             end
         end
@@ -41,7 +40,7 @@ function _M.sql_injection()
             ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
             sql_injection_res = waf_engine:run(rule.content)
             if sql_injection_res then
-                ngx.log(ngx.INFO, "!!! rule match "..rule.rule_id)
+                ngx.log(ngx.INFO, "!!! rule match !!! "..rule.rule_id)
                 return true
             end
         end
