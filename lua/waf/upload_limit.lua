@@ -19,20 +19,21 @@ end
 function _M.upload_check(self)
     ngx.req.read_body()
     local body = ngx.req.get_body_data()
-    local p, err = parser.new(body, ngx.var.http_content_type)
-    if not p then
-        ngx.log(ngx.ERROR, "failed to create parser: "..err)
-        return
-    end
-    -- load upload file
-    while true do
-        local file = p:parse_part()
-        if not file then
-            break
+    if body then
+        local p, err = parser.new(body, ngx.var.http_content_type)
+        if not p then
+            ngx.log(ngx.ERR, "failed to create parser: "..err)
+            return
         end
-        tprint(file)
-        if self:php_check(file['part_body']) then
-            return true
+        -- load upload file
+        while true do
+            local file = p:parse_part()
+            if not file then
+                break
+            end
+            if self:php_check(file['part_body']) then
+                return true
+            end
         end
     end
     return false
@@ -41,6 +42,10 @@ end
 function _M.php_check(self, part_body)
     -- match php start tag
     if rulematch(part_body, '<\\?[\\s\\n\\b]*php', "jo") then
+        return true
+    end
+    -- match eval
+    if rulematch(part_body, '@?eval[\\s\\b]*\\w*\\(+', "jo") then
         return true
     end
 end

@@ -3,8 +3,8 @@ local web_general_sec = require 'waf/web_general_sec'
 local http_protocol_validation = require 'waf/http_protocol_validation'
 local upload_limit = require 'waf/upload_limit'
 
--- local content_length = tonumber(ngx.req.get_headers()['content-length'])
 local method = ngx.req.get_method()
+local headers = ngx.req.get_headers()
 
 if config.waf_enable then
     if config.http_protocol_validation then
@@ -17,9 +17,11 @@ if config.waf_enable then
     end
     -- post need check file upload
     if method == 'POST' then
-        if config.upload_limit then
-            local upload_limit = upload_limit:new()
-            upload_limit:check()
+        if string.sub(headers["content-type"],1,20) == 'multipart/form-data;' then
+            if config.upload_limit then
+                local upload_limit = upload_limit:new()
+                upload_limit:check()
+            end
         end
     end
     -- todo:

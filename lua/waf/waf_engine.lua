@@ -9,7 +9,6 @@ local _M = {
 }
 
 local mt = {  __index = _M }
-local get_headers = ngx.req.get_headers
 
 function _M.new()
     local t = {
@@ -20,7 +19,7 @@ end
 
 
 function _M.run(self, rule)
-    self.headers = get_headers()
+    self.headers = ngx.req.get_headers()
     self.args = ngx.req.get_uri_args()
     self.uri = ngx.var.uri
     self.cookie = ck:new()
@@ -84,7 +83,7 @@ function _M.syntax(self, keyword, v1, v2)
         -- length between a list split by ,
         length = string.len(v1)
         length_range = split(v2, ',')
-        if length > tonumber(length_range[1]) and length < tonumber(length_range[2]) then
+        if length >= tonumber(length_range[1]) and length <= tonumber(length_range[2]) then
             return true
         end
     elseif keyword == 'nlbetw' then
@@ -163,27 +162,46 @@ function _M.parser(self, lex)
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local arg_flag = false
+        local n_flag = string.sub(vlist[1], 1, 1)
 
-        for _arg_name, _arg_value in pairs(self.args) do
-            -- check for arg name
-            if lex['key'] == 'arg-name' then
-                check_v = _arg_name
-            -- check for arg value
-            else
-                check_v = _arg_value
+        if self.args then
+            for _arg_name, _arg_value in pairs(self.args) do
+                -- check for arg name
+                if lex['key'] == 'arg-name' then
+                    check_v = _arg_name
+                -- check for arg value
+                else
+                    check_v = _arg_value
+                end
+                if n_flag ~= 'n' then
+                    local _match = self:syntax(vlist[1], check_v, vlist[2])
+                    if _match then
+                        arg_flag = true
+                        if (lex['flag'] == 's') then
+                            return true
+                        elseif (lex['flag'] == 'c') then
+                            c_flag = true
+                        end
+                    end
+                else
+                    -- else: loop all value 
+                    local _match = self:syntax(vlist[1], check_v, vlist[2])
+                    if not _match then
+                        return false
+                    end
+                end
             end
-            local _match = self:syntax(vlist[1], check_v, vlist[2])
-            if _match then
-                arg_flag = true
+        end
+        if not arg_flag then
+            if n_flag == 'n' then
                 if (lex['flag'] == 's') then
                     return true
                 elseif (lex['flag'] == 'c') then
                     c_flag = true
                 end
+            else
+                return false
             end
-        end
-        if not arg_flag then
-            return false
         end
     end
     -- this Conditions is for cookies.
@@ -192,6 +210,8 @@ function _M.parser(self, lex)
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local cookie_flag = false
+        -- this n flag means not "keyword", for loop we need distinguish them in loop
+        local n_flag = string.sub(vlist[1], 1, 1)
 
         -- if cookies exists
         if self.cookies then
@@ -201,26 +221,45 @@ function _M.parser(self, lex)
                 else
                     check_v = _cookie_value
                 end
-                local _match = self:syntax(vlist[1], check_v, vlist[2])
-                if _match then
-                    cookie_flag = true
-                    if (lex['flag'] == 's') then
-                        return true
-                    elseif (lex['flag'] == 'c') then
-                        c_flag = true
+                if n_flag ~= 'n' then
+                    local _match = self:syntax(vlist[1], check_v, vlist[2])
+                    if _match then
+                        cookie_flag = true
+                        if (lex['flag'] == 's') then
+                            return true
+                        elseif (lex['flag'] == 'c') then
+                            c_flag = true
+                        end
+                    end
+                else
+                    -- else: loop all value
+                    local _match = self:syntax(vlist[1], check_v, vlist[2])
+                    if not _match then
+                        return false
                     end
                 end
             end
         end
         if not cookie_flag then
-            return false
+            if n_flag == 'n' then
+                if (lex['flag'] == 's') then
+                    return true
+                elseif (lex['flag'] == 'c') then
+                    c_flag = true
+                end
+            else
+                return false
+            end
         end
     end
     -- header check
     if lex['key'] == 'header' or lex['key'] == 'header_name' then
+        print("xxxxx")
         ngx.log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local header_flag = false
+        -- this n flag means not "keyword", for loop we need distinguish them in loop
+        local n_flag = string.sub(vlist[1], 1, 1)
 
         for _header_name, _header_value in pairs(self.headers) do
             if (lex['key'] == 'header_name') then
@@ -228,18 +267,35 @@ function _M.parser(self, lex)
             else
                 check_v = _header_value
             end
-            local _match = self:syntax(vlist[1], check_v, vlist[2])
-            if _match then
-                header_flag = true
+            print(check_v)
+            if n_flag ~= 'n' then
+                local _match = self:syntax(vlist[1], check_v, vlist[2])
+                if _match then
+                    header_flag = true
+                    if (lex['flag'] == 's') then
+                        return true
+                    elseif (lex['flag'] == 'c') then
+                        c_flag = true
+                    end
+                end
+            else
+                -- else: loop all value
+                local _match = self:syntax(vlist[1], check_v, vlist[2])
+                if not _match then
+                    return false
+                end
+            end
+        end
+        if not header_flag then
+            if n_flag == 'n' then
                 if (lex['flag'] == 's') then
                     return true
                 elseif (lex['flag'] == 'c') then
                     c_flag = true
                 end
+            else
+                return false
             end
-        end
-        if not header_flag then
-            return false
         end
     end
     -- this is single check. and you can think it is "or"
