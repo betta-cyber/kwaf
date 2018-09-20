@@ -11,6 +11,8 @@ local _M = {
     web_general_sec = true,
     --enable/disable upload_limit
     upload_limit = true,
+    --enable/disable info_leak
+    info_leak = true,
 }
 
 return _M
