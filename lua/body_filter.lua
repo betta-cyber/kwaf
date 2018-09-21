@@ -1,13 +1,13 @@
 local config = require 'config'
-local info_leak = require 'waf/info_leak'
+local sensitive_info = require 'waf/sensitive_info'
 
 -- response body
 local res_body = ngx.arg[1]
 
 if config.waf_enable then
-    if config.info_leak then
-        local info_leak = info_leak:new()
-        res = info_leak:check(res_body)
+    if config.sensitive_info then
+        local sensitive_info = sensitive_info:new()
+        res = sensitive_info:check(res_body)
     end
 end
 

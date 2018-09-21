@@ -25,5 +25,8 @@ add this in your nginx conf
 ```
 access_by_lua_file 'lua/waf.lua';
 ```
+```
+body_filter_by_lua_file 'lua/body_filter.lua';
+```
 
 enable which protect you want
