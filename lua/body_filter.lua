@@ -9,7 +9,8 @@ if config.waf_enable then
         local sensitive_info = sensitive_info:new()
         res = sensitive_info:check(res_body)
     end
+    -- write to response
+    ngx.arg[1] = res
+else
+    ngx.arg[1] = res_body
 end
-
--- write to response
-ngx.arg[1] = res
