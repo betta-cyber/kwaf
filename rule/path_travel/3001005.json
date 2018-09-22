@@ -1,0 +1,23 @@
+{
+    "rule_id":30010105,
+    "enable": true,
+    "content": {
+        "key":"single",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"method",
+                "value":"belong:[GET]",
+                "flag":"c",
+                "next": [
+                    {
+                        "key":"arg",
+                        "value":"re:~\\\/+",
+                        "flag":"s"
+                    }
+                ]
+            }
+        ]
+    },
+    "desc": "unix home目录访问"
+}

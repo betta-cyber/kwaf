@@ -1,0 +1,21 @@
+{
+    "rule_id":30010103,
+    "enable": false,
+    "content": {
+        "key":"single",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"uri",
+                "value":"re:(^|\\W)[a-zA-Z]:[\\\/\\\\]",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"re:(^|\\W)[a-zA-Z]:[\\\/\\\\]",
+                "flag":"s"
+            }
+        ]
+    },
+    "desc": "windows path travel 有误报，在windows下"
+}

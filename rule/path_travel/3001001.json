@@ -1,0 +1,26 @@
+{
+    "rule_id":30010101,
+    "enable": true,
+    "content": {
+        "key":"single",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"uri",
+                "value":"re:(?i)\\\/\\.(svn|git)",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"re:(?i)[\\\/\\\\]\\.(svn|git)",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"re:(?i)[\\\/\\\\]\\.(svn|git)",
+                "flag":"s"
+            }
+        ]
+    },
+    "desc": "git svn path travel"
+}

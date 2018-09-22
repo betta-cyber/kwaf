@@ -1,0 +1,48 @@
+{
+    "rule_id": 30010102,
+    "enable": true,
+    "content": {
+        "key": "single",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"uri",
+                "value": "re:(?i)\\\/etc\\\/+passwd",
+                "flag": "s"
+            },
+            {
+                "key":"multiline",
+                "value":[
+                    {
+                        "key":"arg",
+                        "value":"re:(?i)\/+etc\/+passwd",
+                        "flag":"s"
+                    },
+                    {
+                        "key":"arg",
+                        "value":"nlbetw:0,10",
+                        "flag":"s"
+                    }
+                ],
+                "flag":"s"
+            },
+            {
+                "key":"multiline",
+                "value":[
+                    {
+                        "key":"cookie",
+                        "value":"re:(?i)\/+etc\/+passwd",
+                        "flag":"s"
+                    },
+                    {
+                        "key":"cookie",
+                        "value":"nlbetw:0,10",
+                        "flag":"s"
+                    }
+                ],
+                "flag":"s"
+            }
+        ]
+    },
+    "desc": "/etc/passwd 泄露"
+}

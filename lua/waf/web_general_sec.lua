@@ -65,6 +65,23 @@ function _M.web_plugin()
     return false
 end
 
+function _M.path_travel()
+    local PATH_TRAVEL_RULES_JSON = get_rule('path_travel')
+    local PATH_TRAVEL_RULES = cjson.decode(PATH_TRAVEL_RULES_JSON);
+    local waf_engine = engine:new()
+    for _, rule in pairs(PATH_TRAVEL_RULES) do
+        if rule.enable then
+            ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
+            web_plugin_res = waf_engine:run(rule.content)
+            if web_plugin_res then
+                ngx.log(ngx.INFO, "!!! rule match !!! "..rule.rule_id)
+                return true
+            end
+        end
+    end
+    return false
+end
+
 -- main function
 function _M.check(self)
     if self:xss_rule() then
@@ -74,6 +91,9 @@ function _M.check(self)
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
     if self:web_plugin() then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:path_travel() then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
     -- if all rule pass
