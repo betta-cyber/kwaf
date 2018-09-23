@@ -2,8 +2,6 @@ local tools = require "waf/tools"
 local regex require "resty.core.regex"
 local ck = require "resty.cookie"
 
-local rulematch = ngx.re.find
-
 local _M = {
     _VERSION = "0.0.1"
 }
@@ -11,25 +9,37 @@ local _M = {
 local mt = {  __index = _M }
 
 function _M.new()
+    local method = ngx.req.get_method()
+    local cookie = ck:new()
+    local cookies = cookie:get_all()
+    if method == "POST" then
+        ngx.req.read_body()
+        local post_args, err = ngx.req.get_post_args()
+    end
     local t = {
-        var = {},
+        headers = ngx.req.get_headers(),
+        args = ngx.req.get_uri_args(),
+        uri = ngx.var.uri,
+        cookies = cookies,
+        post_args = post_args,
+        method = method,
     }
     return setmetatable(t, mt)
 end
 
 
 function _M.run(self, rule)
-    self.headers = ngx.req.get_headers()
-    self.args = ngx.req.get_uri_args()
-    self.uri = ngx.var.uri
-    self.cookie = ck:new()
-    self.cookies = self.cookie:get_all()
-    self.method = ngx.req.get_method()
+    -- self.headers = ngx.req.get_headers()
+    -- self.args = ngx.req.get_uri_args()
+    -- self.uri = ngx.var.uri
+    -- self.cookie = ck:new()
+    -- self.cookies = self.cookie:get_all()
+    -- self.method = ngx.req.get_method()
 
-    if method == "POST" then
-        ngx.req.read_body()
-        self.post_args, err = ngx.req.get_post_args()
-    end
+    -- if method == "POST" then
+    --     ngx.req.read_body()
+    --     self.post_args, err = ngx.req.get_post_args()
+    -- end
 
     return self:parser(rule)
 end
@@ -41,11 +51,15 @@ end
 -- need add not regular and not equal and exists and not exists and not belong
 -- and type and between and length between and count between
 function _M.syntax(self, keyword, v1, v2)
+    -- string lower and match
+    local lower = string.lower
+    local rulematch = ngx.re.find
+    -- start match
     if keyword == 'belong' then
         -- belong to list, Surrounded by []
-        belong_list = split(string.sub(v2, 2, -2), ',')
+        local belong_list = split(string.sub(v2, 2, -2), ',')
         for _, bv in pairs(belong_list) do
-            if string.lower(bv) == string.lower(v1) then
+            if lower(bv) == lower(v1) then
                 return true
             end
         end
@@ -61,12 +75,12 @@ function _M.syntax(self, keyword, v1, v2)
         end
     elseif keyword == 'req' then
         -- ignore case equal
-        if string.lower(v1) == string.lower(v2) then
+        if lower(v1) == lower(v2) then
             return true
         end
     elseif keyword == 'nreq' then
         -- not ignore case equal
-        if string.lower(v1) ~= string.lower(v2) then
+        if lower(v1) ~= lower(v2) then
             return true
         end
     elseif keyword == 're' then
@@ -81,29 +95,29 @@ function _M.syntax(self, keyword, v1, v2)
         end
     elseif keyword == 'lbetw' then
         -- length between a list split by ,
-        length = string.len(v1)
-        length_range = split(v2, ',')
+        local length = string.len(v1)
+        local length_range = split(v2, ',')
         if length >= tonumber(length_range[1]) and length <= tonumber(length_range[2]) then
             return true
         end
     elseif keyword == 'nlbetw' then
         -- not length between a list split by ,
-        length = string.len(v1)
-        length_range = split(v2, ',')
+        local length = string.len(v1)
+        local length_range = split(v2, ',')
         if length < tonumber(length_range[1]) or length > tonumber(length_range[2]) then
             return true
         end
     elseif keyword == 'cbetw' then
         -- count between
-        count = table.getn(v1)
-        count_range = split(v2, ',')
+        local count = table.getn(v1)
+        local count_range = split(v2, ',')
         if count > tonumber(count_range[1]) and count < tonumber(count_range[2]) then
             return true
         end
     elseif keyword == 'ncbetw' then
         -- not count between
-        count = table.getn(v1)
-        count_range = split(v2, ',')
+        local count = table.getn(v1)
+        local count_range = split(v2, ',')
         if count < tonumber(count_range[1]) or count > tonumber(count_range[2]) then
             return true
         end
@@ -113,7 +127,8 @@ end
 
 -- parser json content
 function _M.parser(self, lex)
-    ngx.log(ngx.INFO, "--------"..lex['key'].."--------")
+    local Log = ngx.log
+    Log(ngx.INFO, "--------"..lex['key'].."--------")
     -- c flag means continue , if c flag is true, this rule will go on to check
     -- and we need to get the "next" rule result, if next Conditions return true
     -- this rule return true.
@@ -122,7 +137,7 @@ function _M.parser(self, lex)
     local c_flag = false
     -- method check
     if lex['key'] == 'method' then
-        ngx.log(ngx.INFO, "method check")
+        Log(ngx.INFO, "method check")
         local vlist = split(lex['value'], ':')
         local _match = self:syntax(vlist[1], self.method, vlist[2])
         if _match then
@@ -140,7 +155,7 @@ function _M.parser(self, lex)
     -- this conditions is for uri.
     -- uri check
     if lex['key'] == 'uri' then
-        ngx.log(ngx.INFO, "uri check")
+        Log(ngx.INFO, "uri check")
         local vlist = split(lex['value'], ':')
         local _match = self:syntax(vlist[1], self.uri, vlist[2])
         -- match rule
@@ -159,7 +174,7 @@ function _M.parser(self, lex)
     -- this conditions is for args.
     -- include check for arg name and arg value.
     if lex['key'] == 'arg' or lex['key'] == 'arg-name' then
-        ngx.log(ngx.INFO, lex['key'].." check")
+        Log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local arg_flag = false
         local n_flag = string.sub(vlist[1], 1, 1)
@@ -207,7 +222,7 @@ function _M.parser(self, lex)
     -- this Conditions is for cookies.
     -- include check for cookie name and cookie value.
     if lex['key'] == 'cookie' or lex['key'] == 'cookie_name' then
-        ngx.log(ngx.INFO, lex['key'].." check")
+        Log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local cookie_flag = false
         -- this n flag means not "keyword", for loop we need distinguish them in loop
@@ -254,8 +269,7 @@ function _M.parser(self, lex)
     end
     -- header check
     if lex['key'] == 'header' or lex['key'] == 'header_name' then
-        print("xxxxx")
-        ngx.log(ngx.INFO, lex['key'].." check")
+        Log(ngx.INFO, lex['key'].." check")
         local vlist = split(lex['value'], ':')
         local header_flag = false
         -- this n flag means not "keyword", for loop we need distinguish them in loop
@@ -267,7 +281,6 @@ function _M.parser(self, lex)
             else
                 check_v = _header_value
             end
-            print(check_v)
             if n_flag ~= 'n' then
                 local _match = self:syntax(vlist[1], check_v, vlist[2])
                 if _match then
@@ -300,11 +313,11 @@ function _M.parser(self, lex)
     end
     -- this is single check. and you can think it is "or"
     if lex['key'] == 'single' then
-        ngx.log(ngx.INFO, "single check")
+        Log(ngx.INFO, "single check")
         local single_flag = false
         for _, lv in pairs(lex['value']) do
             single_flag = (single_flag or self:parser(lv))
-            ngx.log(ngx.DEBUG, "current single flag: ", single_flag)
+            Log(ngx.DEBUG, "current single flag: ", single_flag)
             -- if single flag become true, no need to contoune
             if single_flag then
                 if(lex['flag'] == 's') then
@@ -318,11 +331,11 @@ function _M.parser(self, lex)
     end
     -- this is for multiline check. and you can think it is "and"
     if lex['key'] == 'multiline' then
-        ngx.log(ngx.INFO, "multiline check")
+        Log(ngx.INFO, "multiline check")
         local mulit_flag = true
         for _, lv in pairs(lex['value']) do
             mulit_flag = (mulit_flag and self:parser(lv))
-            ngx.log(ngx.DEBUG, "current mulit flag: ", mulit_flag)
+            Log(ngx.DEBUG, "current mulit flag: ", mulit_flag)
             if not mulit_flag then
                 return false
             end
@@ -340,7 +353,7 @@ function _M.parser(self, lex)
         local v_flag = false
         for _, lv in pairs(lex['next']) do
             v_flag = (v_flag or self:parser(lv))
-            ngx.log(ngx.DEBUG, "current c_flag: ", v_flag)
+            Log(ngx.DEBUG, "current c_flag: ", v_flag)
             -- break and do not go next check
             if(v_flag == true) then
                 return v_flag
