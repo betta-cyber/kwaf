@@ -53,7 +53,7 @@ end
 function _M.syntax(self, keyword, v1, v2)
     -- string lower and match
     local lower = string.lower
-    local rulematch = ngx.re.find
+    local rulematch = ngx.re.match
     -- start match
     if keyword == 'belong' then
         -- belong to list, Surrounded by []
@@ -128,7 +128,10 @@ end
 -- parser json content
 function _M.parser(self, lex)
     local Log = ngx.log
-    Log(ngx.INFO, "--------"..lex['key'].."--------")
+    local lex_key = lex['key']
+    local lex_flag = lex['flag']
+    local lex_value = lex['value']
+    Log(ngx.INFO, "--------"..lex_key.."--------")
     -- c flag means continue , if c flag is true, this rule will go on to check
     -- and we need to get the "next" rule result, if next Conditions return true
     -- this rule return true.
@@ -136,14 +139,13 @@ function _M.parser(self, lex)
     -- check continue, just return current node check result.
     local c_flag = false
     -- method check
-    if lex['key'] == 'method' then
-        Log(ngx.INFO, "method check")
-        local vlist = split(lex['value'], ':')
+    if lex_key == 'method' then
+        local vlist = split(lex_value, ':')
         local _match = self:syntax(vlist[1], self.method, vlist[2])
         if _match then
-            if (lex['flag'] == 's') then
+            if (lex_flag == 's') then
                 return true
-            elseif (lex['flag'] == 'c') then
+            elseif (lex_flag == 'c') then
                 c_flag = true
             end
         end
@@ -151,18 +153,16 @@ function _M.parser(self, lex)
         if( _match == false) then
             return false
         end
-    end
     -- this conditions is for uri.
     -- uri check
-    if lex['key'] == 'uri' then
-        Log(ngx.INFO, "uri check")
-        local vlist = split(lex['value'], ':')
+    elseif lex_key == 'uri' then
+        local vlist = split(lex_value, ':')
         local _match = self:syntax(vlist[1], self.uri, vlist[2])
         -- match rule
         if _match then
-            if (lex['flag'] == 's') then
+            if (lex_flag == 's') then
                 return true
-            elseif (lex['flag'] == 'c') then
+            elseif (lex_flag == 'c') then
                 c_flag = true
             end
         end
@@ -170,19 +170,17 @@ function _M.parser(self, lex)
         if( _match == false) then
             return false
         end
-    end
     -- this conditions is for args.
     -- include check for arg name and arg value.
-    if lex['key'] == 'arg' or lex['key'] == 'arg-name' then
-        Log(ngx.INFO, lex['key'].." check")
-        local vlist = split(lex['value'], ':')
+    elseif lex_key == 'arg' or lex_key == 'arg-name' then
+        local vlist = split(lex_value, ':')
         local arg_flag = false
         local n_flag = string.sub(vlist[1], 1, 1)
 
         if self.args then
             for _arg_name, _arg_value in pairs(self.args) do
                 -- check for arg name
-                if lex['key'] == 'arg-name' then
+                if lex_key == 'arg-name' then
                     check_v = _arg_name
                 -- check for arg value
                 else
@@ -192,9 +190,9 @@ function _M.parser(self, lex)
                     local _match = self:syntax(vlist[1], check_v, vlist[2])
                     if _match then
                         arg_flag = true
-                        if (lex['flag'] == 's') then
+                        if (lex_flag == 's') then
                             return true
-                        elseif (lex['flag'] == 'c') then
+                        elseif (lex_flag == 'c') then
                             c_flag = true
                         end
                     end
@@ -209,21 +207,19 @@ function _M.parser(self, lex)
         end
         if not arg_flag then
             if n_flag == 'n' then
-                if (lex['flag'] == 's') then
+                if (lex_flag == 's') then
                     return true
-                elseif (lex['flag'] == 'c') then
+                elseif (lex_flag == 'c') then
                     c_flag = true
                 end
             else
                 return false
             end
         end
-    end
     -- this Conditions is for cookies.
     -- include check for cookie name and cookie value.
-    if lex['key'] == 'cookie' or lex['key'] == 'cookie_name' then
-        Log(ngx.INFO, lex['key'].." check")
-        local vlist = split(lex['value'], ':')
+    elseif lex_key == 'cookie' or lex_key == 'cookie_name' then
+        local vlist = split(lex_value, ':')
         local cookie_flag = false
         -- this n flag means not "keyword", for loop we need distinguish them in loop
         local n_flag = string.sub(vlist[1], 1, 1)
@@ -231,7 +227,7 @@ function _M.parser(self, lex)
         -- if cookies exists
         if self.cookies then
             for _cookie_name, _cookie_value in pairs(self.cookies) do
-                if (lex['key'] == 'cookie_name') then
+                if (lex_key == 'cookie_name') then
                     check_v = _cookie_name
                 else
                     check_v = _cookie_value
@@ -240,9 +236,9 @@ function _M.parser(self, lex)
                     local _match = self:syntax(vlist[1], check_v, vlist[2])
                     if _match then
                         cookie_flag = true
-                        if (lex['flag'] == 's') then
+                        if (lex_flag == 's') then
                             return true
-                        elseif (lex['flag'] == 'c') then
+                        elseif (lex_flag == 'c') then
                             c_flag = true
                         end
                     end
@@ -257,26 +253,24 @@ function _M.parser(self, lex)
         end
         if not cookie_flag then
             if n_flag == 'n' then
-                if (lex['flag'] == 's') then
+                if (lex_flag == 's') then
                     return true
-                elseif (lex['flag'] == 'c') then
+                elseif (lex_flag == 'c') then
                     c_flag = true
                 end
             else
                 return false
             end
         end
-    end
     -- header check
-    if lex['key'] == 'header' or lex['key'] == 'header_name' then
-        Log(ngx.INFO, lex['key'].." check")
-        local vlist = split(lex['value'], ':')
+    elseif lex_key == 'header' or lex_key == 'header_name' then
+        local vlist = split(lex_value, ':')
         local header_flag = false
         -- this n flag means not "keyword", for loop we need distinguish them in loop
         local n_flag = string.sub(vlist[1], 1, 1)
 
         for _header_name, _header_value in pairs(self.headers) do
-            if (lex['key'] == 'header_name') then
+            if (lex_key == 'header_name') then
                 check_v = _header_name
             else
                 check_v = _header_value
@@ -285,9 +279,9 @@ function _M.parser(self, lex)
                 local _match = self:syntax(vlist[1], check_v, vlist[2])
                 if _match then
                     header_flag = true
-                    if (lex['flag'] == 's') then
+                    if (lex_flag == 's') then
                         return true
-                    elseif (lex['flag'] == 'c') then
+                    elseif (lex_flag == 'c') then
                         c_flag = true
                     end
                 end
@@ -301,39 +295,35 @@ function _M.parser(self, lex)
         end
         if not header_flag then
             if n_flag == 'n' then
-                if (lex['flag'] == 's') then
+                if (lex_flag == 's') then
                     return true
-                elseif (lex['flag'] == 'c') then
+                elseif (lex_flag == 'c') then
                     c_flag = true
                 end
             else
                 return false
             end
         end
-    end
     -- this is single check. and you can think it is "or"
-    if lex['key'] == 'single' then
-        Log(ngx.INFO, "single check")
+    elseif lex_key == 'single' then
         local single_flag = false
-        for _, lv in pairs(lex['value']) do
+        for _, lv in pairs(lex_value) do
             single_flag = (single_flag or self:parser(lv))
             Log(ngx.DEBUG, "current single flag: ", single_flag)
             -- if single flag become true, no need to contoune
             if single_flag then
-                if(lex['flag'] == 's') then
+                if(lex_flag == 's') then
                     return true
-                elseif(lex['flag'] == 'c') then
+                elseif(lex_flag == 'c') then
                     c_flag = true
                 end
             end
         end
         return single_flag
-    end
     -- this is for multiline check. and you can think it is "and"
-    if lex['key'] == 'multiline' then
-        Log(ngx.INFO, "multiline check")
+    elseif lex_key == 'multiline' then
         local mulit_flag = true
-        for _, lv in pairs(lex['value']) do
+        for _, lv in pairs(lex_value) do
             mulit_flag = (mulit_flag and self:parser(lv))
             Log(ngx.DEBUG, "current mulit flag: ", mulit_flag)
             if not mulit_flag then
@@ -341,9 +331,9 @@ function _M.parser(self, lex)
             end
         end
         if mulit_flag then
-            if(lex['flag'] == 's') then
+            if(lex_flag == 's') then
                 return true
-            elseif(lex['flag'] == 'c') then
+            elseif(lex_flag == 'c') then
                 c_flag = true
             end
         end

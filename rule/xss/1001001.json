@@ -1,5 +1,5 @@
 {
-    "rule_id":1001001,
+    "rule_id":10010101,
     "enable": true,
     "content":{
         "key":"method",

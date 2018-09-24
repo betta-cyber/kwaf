@@ -45,6 +45,7 @@ function _M.xss_rule(self)
         XSS_RULES_JSON = get_rule('xss')
         self.red:set('xss', XSS_RULES_JSON)
     end
+    -- 0.14ms decode json
     local XSS_RULES = cjson.decode(XSS_RULES_JSON)
     for _, rule in pairs(XSS_RULES) do
         if rule.enable then
