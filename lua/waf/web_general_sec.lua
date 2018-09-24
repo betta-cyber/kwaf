@@ -39,14 +39,18 @@ function _M.new(self, host, port, pass)
     return setmetatable(t, mt)
 end
 
-function _M.xss_rule(self)
-    local XSS_RULES_JSON = self.red:get('xss')
-    if XSS_RULES_JSON == ngx.null then
-        XSS_RULES_JSON = get_rule('xss')
-        self.red:set('xss', XSS_RULES_JSON)
+function _M.get_rule_json(self, keyword)
+    local RULES_JSON = self.red:get(keyword)
+    if RULES_JSON == ngx.null then
+        RULES_JSON = get_rule(keyword)
+        self.red:set(keyword, RULES_JSON)
     end
     -- 0.14ms decode json
-    local XSS_RULES = cjson.decode(XSS_RULES_JSON)
+    return cjson.decode(RULES_JSON)
+end
+
+function _M.xss_rule(self) 
+    local XSS_RULES = self:get_rule_json('xss')
     for _, rule in pairs(XSS_RULES) do
         if rule.enable then
             ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
@@ -61,12 +65,7 @@ function _M.xss_rule(self)
 end
 
 function _M.sql_injection(self)
-    local SQL_INJECTION_RULES_JSON = self.red:get('sql_injection')
-    if SQL_INJECTION_RULES_JSON == ngx.null then
-        SQL_INJECTION_RULES_JSON = get_rule('sql_injection')
-        self.red:set('sql_injection', SQL_INJECTION_RULES_JSON)
-    end
-    local SQL_INJECTION_RULES = cjson.decode(SQL_INJECTION_RULES_JSON)
+    local SQL_INJECTION_RULES = self:get_rule_json('sql_injection')
     for _, rule in pairs(SQL_INJECTION_RULES) do
         if rule.enable then
             ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
@@ -81,12 +80,7 @@ function _M.sql_injection(self)
 end
 
 function _M.web_plugin(self)
-    local WEB_PLUGIN_RULES_JSON = self.red:get('web_plugin')
-    if WEB_PLUGIN_RULES_JSON == ngx.null then
-        WEB_PLUGIN_RULES_JSON = get_rule('web_plugin')
-        self.red:set('web_plugin', WEB_PLUGIN_RULES_JSON)
-    end
-    local WEB_PLUGIN_RULES = cjson.decode(WEB_PLUGIN_RULES_JSON)
+    local WEB_PLUGIN_RULES = self:get_rule_json('web_plugin')
     for _, rule in pairs(WEB_PLUGIN_RULES) do
         if rule.enable then
             ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
@@ -101,12 +95,7 @@ function _M.web_plugin(self)
 end
 
 function _M.path_travel(self)
-    local PATH_TRAVEL_RULES_JSON = self.red:get('path_travel')
-    if PATH_TRAVEL_RULES_JSON == ngx.null then
-        PATH_TRAVEL_RULES_JSON = get_rule('path_travel')
-        self.red:set('path_travel', PATH_TRAVEL_RULES_JSON)
-    end
-    local PATH_TRAVEL_RULES = cjson.decode(PATH_TRAVEL_RULES_JSON)
+    local PATH_TRAVEL_RULES = self:get_rule_json('path_travel')
     for _, rule in pairs(PATH_TRAVEL_RULES) do
         if rule.enable then
             ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
