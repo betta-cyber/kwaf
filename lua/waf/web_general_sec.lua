@@ -8,12 +8,12 @@ local _M = {}
 local mt = {  __index = _M }
 local get_headers = ngx.req.get_headers
 
-function _M.new()
+function _M.new(self, host, port, pass)
     local waf_engine = engine:new()
     local red = redis:new()
     red:set_timeout(1000)
 
-    local ok, err = red:connect("127.0.0.1", 6379)
+    local ok, err = red:connect(host, port)
     if not ok then
         ngx.say("failed to connect: ", err)
         return
@@ -22,7 +22,7 @@ function _M.new()
     local count
     count, err = red:get_reused_times()
     if 0 == count then
-        ok, err = red:auth("root")
+        ok, err = red:auth(pass)
         if not ok then
             ngx.say("failed to auth: ", err)
             return

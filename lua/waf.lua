@@ -12,7 +12,7 @@ if config.waf_enable then
         http_protocol_validation:check_in_strategy()
     end
     if config.web_general_sec then
-        local web_general_sec = web_general_sec:new()
+        local web_general_sec = web_general_sec:new(config.redis_host, config.redis_port, config.redis_pass)
         web_general_sec:check()
     end
     -- post need check file upload
