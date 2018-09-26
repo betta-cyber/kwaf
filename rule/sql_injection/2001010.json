@@ -1,0 +1,36 @@
+{
+    "rule_id": 2001010,
+    "enable": true,
+    "content": {
+        "key": "single",
+        "flag": "s",
+        "value":  [
+            {
+                "key":"uri",
+                "value": "re:(?i)union[\\s\\xa0\\x00-\\x1f]*(all)?[\\s\\xa0\\x00-\\x1f]*\\(?.*[\\s\\xa0\\x00-\\x1f]*select([\"'(\\\/+]|[\\s\\xa0\\x00-\\x1f]+)",
+                "flag": "s"
+            },
+            {
+                "key":"arg",
+                "value": "re:(?i)union[\\s\\xa0\\x00-\\x1f]*(all)?[\\s\\xa0\\x00-\\x1f]*\\(?.*[\\s\\xa0\\x00-\\x1f]*select([\"'(\\\/+]|[\\s\\xa0\\x00-\\x1f]+)",
+                "flag":"s"
+            },
+            {
+                "key":"arg-name",
+                "value": "re:(?i)union[\\s\\xa0\\x00-\\x1f]*(all)?[\\s\\xa0\\x00-\\x1f]*\\(?.*[\\s\\xa0\\x00-\\x1f]*select([\"'(\\\/+]|[\\s\\xa0\\x00-\\x1f]+)",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value": "re:(?i)union[\\s\\xa0\\x00-\\x1f]*(all)?[\\s\\xa0\\x00-\\x1f]*\\(?.*[\\s\\xa0\\x00-\\x1f]*select([\"'(\\\/+]|[\\s\\xa0\\x00-\\x1f]+)",
+                "flag":"s"
+            },
+            {
+                "key":"cookie-name",
+                "value": "re:(?i)union[\\s\\xa0\\x00-\\x1f]*(all)?[\\s\\xa0\\x00-\\x1f]*\\(?.*[\\s\\xa0\\x00-\\x1f]*select([\"'(\\\/+]|[\\s\\xa0\\x00-\\x1f]+)",
+                "flag":"s"
+            }
+        ]
+    },
+    "desc": "该规则对sql语句中包含union的语句进行检测"
+}
