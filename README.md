@@ -21,6 +21,9 @@ https://github.com/keplerproject/luafilesystem
 install require by [luarocks](https://luarocks.org/)
 
 add this in your nginx conf
+```
+lua_shared_dict rule_cache 128m;
+```
 
 ```
 access_by_lua_file 'lua/waf.lua';

@@ -13,12 +13,6 @@ local _M = {
     upload_limit = true,
     --enable/disable sensitive_info
     sensitive_info = true,
-    --redis config
-    redis_host = "127.0.0.1",
-    --redis port
-    redis_port = 6379,
-    --redis pass
-    redis_pass = "root"
 }
 
 return _M

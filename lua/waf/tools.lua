@@ -76,3 +76,18 @@ function get_client_ip()
     end
     return CLIENT_IP
 end
+
+function get_from_cache(key)
+    local cache_ngx = ngx.shared.rule_cache
+    local value = cache_ngx:get(key)
+    return value
+end
+
+function set_to_cache(key, value, exptime)
+    if not exptime then
+        exptime = 0
+    end
+    local cache_ngx = ngx.shared.rule_cache
+    local succ, err, forcible = cache_ngx:set(key, value, exptime)
+    return succ
+end

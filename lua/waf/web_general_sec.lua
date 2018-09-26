@@ -1,7 +1,6 @@
 local tools = require "waf/tools"
 local cjson = require "cjson";
 local engine = require "waf/waf_engine"
-local redis = require "resty.redis"
 
 local _M = {}
 
@@ -10,41 +9,46 @@ local get_headers = ngx.req.get_headers
 
 function _M.new(self, host, port, pass)
     local waf_engine = engine:new()
-    local red = redis:new()
-    red:set_timeout(1000)
+    -- local red = redis:new()
+    -- red:set_timeout(1000)
 
-    local ok, err = red:connect(host, port)
-    if not ok then
-        ngx.say("failed to connect: ", err)
-        return
-    end
-    -- 请注意这里 auth 的调用过程
-    local count
-    count, err = red:get_reused_times()
-    if 0 == count then
-        ok, err = red:auth(pass)
-        if not ok then
-            ngx.say("failed to auth: ", err)
-            return
-        end
-    elseif err then
-        ngx.say("failed to get reused times: ", err)
-        return
-    end
+    -- local ok, err = red:connect(host, port)
+    -- if not ok then
+    --     ngx.say("failed to connect: ", err)
+    --     return
+    -- end
+    -- -- 请注意这里 auth 的调用过程
+    -- local count
+    -- count, err = red:get_reused_times()
+    -- if 0 == count then
+    --     ok, err = red:auth(pass)
+    --     if not ok then
+    --         ngx.say("failed to auth: ", err)
+    --         return
+    --     end
+    -- elseif err then
+    --     ngx.say("failed to get reused times: ", err)
+    --     return
+    -- end
     local t = {
         var = {},
-        red = red,
         waf_engine = waf_engine,
     }
     return setmetatable(t, mt)
 end
 
 function _M.get_rule_json(self, keyword)
-    local RULES_JSON = self.red:get(keyword)
-    if RULES_JSON == ngx.null then
+    local RULES_JSON = get_from_cache(keyword)
+    if RULES_JSON == nil then
         RULES_JSON = get_rule(keyword)
-        self.red:set(keyword, RULES_JSON)
+        set_to_cache(keyword, RULES_JSON)
     end
+    -- disable redis
+    -- local RULES_JSON = self.red:get(keyword)
+    -- if RULES_JSON == ngx.null then
+    --     RULES_JSON = get_rule(keyword)
+    --     self.red:set(keyword, RULES_JSON)
+    -- end
     -- 0.14ms decode json
     return cjson.decode(RULES_JSON)
 end
