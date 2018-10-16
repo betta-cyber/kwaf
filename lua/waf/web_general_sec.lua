@@ -103,8 +103,23 @@ function _M.path_travel(self)
     for _, rule in pairs(PATH_TRAVEL_RULES) do
         if rule.enable then
             ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
-            web_plugin_res = self.waf_engine:run(rule.content)
-            if web_plugin_res then
+            path_travel_res = self.waf_engine:run(rule.content)
+            if path_travel_res then
+                ngx.log(ngx.INFO, "!!! rule match !!! "..rule.rule_id)
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function _M.cmd_injection(self)
+    local CMD_INJECTION_RULES = self:get_rule_json('cmd_injection')
+    for _, rule in pairs(CMD_INJECTION_RULES) do
+        if rule.enable then
+            ngx.log(ngx.INFO, "start rule id "..rule.rule_id)
+            cmd_injection_res = self.waf_engine:run(rule.content)
+            if cmd_injection_res then
                 ngx.log(ngx.INFO, "!!! rule match !!! "..rule.rule_id)
                 return true
             end
@@ -125,6 +140,9 @@ function _M.check(self)
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
     if self:path_travel() then
+        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    if self:cmd_injection() then
         return ngx.exit(ngx.HTTP_BAD_REQUEST)
     end
     -- if all rule pass
