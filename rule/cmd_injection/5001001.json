@@ -1,0 +1,31 @@
+{
+    "rule_id":5001001,
+    "enable": true,
+    "content":{
+        "key":"single",
+        "value":  [
+            {
+                "key":"cookie-name",
+                "value":"re:(?i)[`|&;\\(\\)$>]\\s*[$`]?\\(?((\\\/{1,2}[\\w?*]+)*\\\/{1,2})?(ls|ping|find|cat|ifconfig|netstat|kill|reboot|poweroff|shutdown|halt|passwd|uname|id|fdisk|set|echo)($|[|&>`;'$\"\\(\\)\\s]+)\\)?",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"re:(?i)[`|&;\\(\\)$>]\\s*[$`]?\\(?((\\\/{1,2}[\\w?*]+)*\\\/{1,2})?(ls|ping|find|cat|ifconfig|netstat|kill|reboot|poweroff|shutdown|halt|passwd|uname|id|fdisk|set|echo)($|[|&>`;'$\"\\(\\)\\s]+)\\)?",
+                "flag":"s"
+            },
+            {
+                "key":"arg-name",
+                "value":"re:(?i)[`|&;\\(\\)$>]\\s*[$`]?\\(?((\\\/{1,2}[\\w?*]+)*\\\/{1,2})?(ls|ping|find|cat|ifconfig|netstat|kill|reboot|poweroff|shutdown|halt|passwd|uname|id|fdisk|set|echo)($|[|&>`;'$\"\\(\\)\\s]+)\\)?",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"re:(?i)[`|&;\\(\\)$>]\\s*[$`]?\\(?((\\\/{1,2}[\\w?*]+)*\\\/{1,2})?(ls|ping|find|cat|ifconfig|netstat|kill|reboot|poweroff|shutdown|halt|passwd|uname|id|fdisk|set|echo)($|[|&>`;'$\"\\(\\)\\s]+)\\)?",
+                "flag":"s"
+            }
+        ],
+        "flag":"s"
+    },
+    "desc": "过滤请求中的linux/unix cmd"
+}

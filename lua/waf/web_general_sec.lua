@@ -7,7 +7,7 @@ local _M = {}
 local mt = {  __index = _M }
 local get_headers = ngx.req.get_headers
 
-function _M.new(self, host, port, pass)
+function _M.new(self)
     local waf_engine = engine:new()
     -- local red = redis:new()
     -- red:set_timeout(1000)

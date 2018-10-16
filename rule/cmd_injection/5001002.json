@@ -1,0 +1,31 @@
+{
+    "rule_id":5001002,
+    "enable": true,
+    "content":{
+        "key":"single",
+        "value":  [
+            {
+                "key":"cookie-name",
+                "value":"re:(?i)[&|][@\\s]*\\(?[@\\s]*(((ping|find|net|sc|reg|net|taskkill|shutdown|format)\\s+[a-z\\\/])|((ver|dir|ipconfig|netstat|start|set|echo)($|[|&\\s]+)))\\)?",
+                "flag":"s"
+            },
+            {
+                "key":"cookie",
+                "value":"re:(?i)[&|][@\\s]*\\(?[@\\s]*(((ping|find|net|sc|reg|net|taskkill|shutdown|format)\\s+[a-z\\\/])|((ver|dir|ipconfig|netstat|start|set|echo)($|[|&\\s]+)))\\)?",
+                "flag":"s"
+            },
+            {
+                "key":"arg-name",
+                "value":"re:(?i)[&|][@\\s]*\\(?[@\\s]*(((ping|find|net|sc|reg|net|taskkill|shutdown|format)\\s+[a-z\\\/])|((ver|dir|ipconfig|netstat|start|set|echo)($|[|&\\s]+)))\\)?",
+                "flag":"s"
+            },
+            {
+                "key":"arg",
+                "value":"re:(?i)[&|][@\\s]*\\(?[@\\s]*(((ping|find|net|sc|reg|net|taskkill|shutdown|format)\\s+[a-z\\\/])|((ver|dir|ipconfig|netstat|start|set|echo)($|[|&\\s]+)))\\)?",
+                "flag":"s"
+            }
+        ],
+        "flag":"s"
+    },
+    "desc": "过滤请求中的windows cmd"
+}
